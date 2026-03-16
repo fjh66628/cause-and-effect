@@ -4,8 +4,15 @@ using UnityEngine;
 
 public class Maprender : MonoBehaviour
 {
+    private MapManager mapManager;
     void Awake()
     {
-        MapManager.Instance.SetZeroPoint(transform.position);//设置地图管理器零点坐标
+        mapManager = FindObjectOfType<MapManager>();//获取地图管理器组件
+        if(mapManager == null)
+        {
+            Debug.LogError("地图管理器组件不存在");
+            return;
+        }
+        mapManager.SetZeroPoint(transform.position);//设置地图管理器零点坐标
     }
 }

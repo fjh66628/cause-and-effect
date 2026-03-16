@@ -5,12 +5,13 @@ using UnityEngine;
 public enum MapCellContent//地图网格单元格内容
 {
     None,//无内容
+    Water,//水
+    Door_singleuse,//一次性门
+
     Wall,//墙
-    Floor,//地板
-    Door,//门
-    Key,//钥匙
-    Player,//玩家
-    Enemy,//敌人
+    Wall_unbreakable,//不可破坏的墙
+    Collapse,//塌陷处
+    End,//结束点
 }
 
 

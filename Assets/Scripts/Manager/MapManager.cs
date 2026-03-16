@@ -5,9 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 [System.Serializable]
-public class MapManager : SingletonMono<MapManager>//这个脚本管理地图中的坐标
+public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
 {
-    MapCell[,] mapGrid = new MapCell[10, 10];
+    MapCell[,] mapGrid = new MapCell[12, 12];
     public MapCell[,] getMapGrid => mapGrid;//地图的网格数组
     float cellWidth = 1.5f;//网格的宽度
     float cellHeight = 0.5f;//网格的高度
@@ -17,9 +17,18 @@ public class MapManager : SingletonMono<MapManager>//这个脚本管理地图中
     public float getCellWidth => cellWidth;//获取网格的宽度
     public float getCellHeight => cellHeight;//获取网格的高度
     Vector2 zeroPoint;//网格零点坐标
-    [Header("设置玩家初始位置")]
-    [SerializeField] Vector2Int playerPosition = new Vector2Int(0, 0);//玩家初始位置
-    protected override void InitializeSingleton()
+    [Header("玩家位置")]
+    [SerializeField] Vector2Int playerPosition = new Vector2Int(0, 0);//玩家位置
+    void OnEnable()
+    {
+        EventHandler.levelLoaded += UpdateMapInfo;//注册关卡加载事件
+    }
+    void OnDisable()
+    {
+        EventHandler.levelLoaded -= UpdateMapInfo;//注销关卡加载事件
+    }
+
+    void Awake()
     {
         for(int x = 0; x < mapGrid.GetLength(0); x++)
         {
@@ -29,10 +38,31 @@ public class MapManager : SingletonMono<MapManager>//这个脚本管理地图中
             }
         }
         playerPosition=LevelManager.Instance.getPlayerStartPosition;//获取玩家初始位置
-        mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Player);//设置玩家初始位置
         mapGrid[playerPosition.x, playerPosition.y].setStep(0);//设置玩家初始位置的步数为0
-
+        for(int x = 0; x < LevelManager.Instance.getLevelManagement.getUnitPositions.Count; x++)
+        {
+            mapGrid[LevelManager.Instance.getLevelManagement.getUnitPositions[x].getPosition.x, LevelManager.Instance.getLevelManagement.getUnitPositions[x].getPosition.y].setCellContent(LevelManager.Instance.getLevelManagement.getUnitPositions[x].getMapCellContent);//设置其他单位位置
+        }
     }
+
+    /*需要关卡加载逻辑，当关卡加载时，需要更新地图信息*/
+    public void UpdateMapInfo()//更新地图信息
+    {
+        for(int x = 0; x < mapGrid.GetLength(0); x++)
+        {
+            for(int y = 0; y < mapGrid.GetLength(1); y++)
+            {
+                mapGrid[x, y] = new MapCell();
+            }
+        }
+        playerPosition=LevelManager.Instance.getPlayerStartPosition;//获取玩家初始位置
+        mapGrid[playerPosition.x, playerPosition.y].setStep(0);//设置玩家初始位置的步数为0
+        for(int x = 0; x < LevelManager.Instance.getLevelManagement.getUnitPositions.Count; x++)
+        {
+            mapGrid[LevelManager.Instance.getLevelManagement.getUnitPositions[x].getPosition.x, LevelManager.Instance.getLevelManagement.getUnitPositions[x].getPosition.y].setCellContent(LevelManager.Instance.getLevelManagement.getUnitPositions[x].getMapCellContent);//设置其他单位位置
+        }
+    }
+
 
     public Vector2Int MoveDrection(Vector2 mousePosition , Vector2 playerPosition)//通过鼠标坐标获取移动方向，玩家的移动方式为网格移动
     {
@@ -97,23 +127,29 @@ public class MapManager : SingletonMono<MapManager>//这个脚本管理地图中
     }
     public Vector2 GetPlayerWorldPosition()//获取玩家在世界坐标中的位置
     {
-        return GetWorldPosition(FindPlayer());
+        return GetWorldPosition(playerPosition);
     }
     
     Vector2 GetWorldPosition(Vector2Int gridPosition)//通过网格坐标获取世界坐标
     {
         return zeroPoint + basePoint + (float)gridPosition.x * i + (float)gridPosition.y * j;
     }
-    Vector2Int FindPlayer()//查找玩家在地图网格中的坐标
+    public Vector2 GetWorldPosition(MapCellContent mapCellContent)//通过网格内容获取世界坐标
     {
+        return GetWorldPosition(FindGridPosition(mapCellContent));
+        
+    }
+    public Vector2Int FindGridPosition(MapCellContent mapCellContent)//查找玩家在地图网格中的坐标
+    {
+        Vector2Int position;
         for (int m = 0; m < mapGrid.GetLength(0); m++)
         {
             for (int n = 0; n < mapGrid.GetLength(1); n++)
             {
-                if (mapGrid[m, n].getCellContent == MapCellContent.Player)
+                if (mapGrid[m, n].getCellContent == mapCellContent)
                 {
-                    playerPosition = new Vector2Int(m, n);
-                    return playerPosition;
+                    position = new Vector2Int(m, n);
+                    return position;
                 }
             }
         }
@@ -123,7 +159,6 @@ public class MapManager : SingletonMono<MapManager>//这个脚本管理地图中
 
     public void ChangePlayerPosition(Vector2Int position)//改变玩家在地图中的坐标
     {
-        Vector2Int playerPosition = FindPlayer();//查找玩家在地图网格中的坐标
         if(playerPosition == new Vector2Int(-1, -1))
         {
             Debug.LogError("玩家在地图中不存在");
@@ -131,21 +166,73 @@ public class MapManager : SingletonMono<MapManager>//这个脚本管理地图中
         }
         if(position.x + playerPosition.x < 0 || position.x + playerPosition.x >= mapGrid.GetLength(0) || position.y + playerPosition.y < 0 || position.y + playerPosition.y >= mapGrid.GetLength(1))
         {
-            Debug.LogWarning("玩家移动到了地图外部");
+            LeaveTheMap();
             return;
         }
         if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.None)
         {
             MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
-            playerCell.setCellContent(MapCellContent.None);//将玩家所在单元格内容设置为空
-            mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setCellContent(MapCellContent.Player);//将玩家移动到新的单元格
             mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setStep(playerCell.getStep + 1);//将玩家移动到新的单元格的步数设置为玩家所在单元格的步数加一
-            Debug.Log("玩家移动到了" + (position.x + playerPosition.x) + "," + (position.y + playerPosition.y));
+            playerPosition=position+playerPosition;//将玩家移动到新的单元格
+            Debug.Log("玩家移动到了" + playerPosition.x + "," + playerPosition.y );
         }
-        else
+        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.End)
+        {
+            ReachTheEnd();
+        }
+        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall)
+        {
+            ToTheWall();
+        }
+        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_singleuse)
+        {
+            ToTheDoorSingleUse();
+        }
+        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Collapse)
+        {
+            ToTheCollapse();
+        }
+        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall_unbreakable)
+        {
+            ToTheWallUnbreakable();
+        }
+        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Water)
+        {
+            ToTheWater();
+        }
+        else 
         {
             Debug.LogWarning("玩家移动到了已有物品的单元格");
         }
     
+    }
+
+    void LeaveTheMap()//玩家离开地图
+    {
+        Debug.LogWarning("玩家移动到了地图外部");
+    }
+    void ReachTheEnd()//玩家到达目标单元格
+    {
+        Debug.Log("玩家到达了目标单元格");
+    }
+    void ToTheWall()//玩家到达了墙单元格
+    {
+        Debug.LogWarning("玩家到达了墙单元格");
+    }
+    void ToTheDoorSingleUse()//玩家到达了一次性门单元格
+    {
+        Debug.LogWarning("玩家到达了一次性门单元格");
+    }
+    void ToTheCollapse()//玩家到达了塌陷单元格
+    {
+        Debug.LogWarning("玩家到达了塌陷单元格");
+    }
+    void ToTheWallUnbreakable()//玩家到达了不可破坏的墙单元格
+    {
+        Debug.LogWarning("玩家到达了不可破坏的墙单元格");
+    }
+    void ToTheWater()//玩家到达了水单元格
+    {
+        Debug.LogWarning("玩家到达了水单元格");
     }
 }

@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
 public class CameraManager : SingletonMono<CameraManager>
 {
+    [SerializeField]float t = 0.5f;//相机跟随玩家的速度
     private Camera mainCamera;//相机
     public Camera MainCamera
     {
@@ -33,5 +34,12 @@ public class CameraManager : SingletonMono<CameraManager>
     {
         mainCamera=null;
         _=MainCamera;
+    }
+
+    void FixedUpdate()
+    {
+        MapManager mapManager = FindObjectOfType<MapManager>();
+        //相机跟随玩家
+        MainCamera.transform.position = new Vector3(t*mapManager.GetPlayerWorldPosition().x, t*mapManager.GetPlayerWorldPosition().y, MainCamera.transform.position.z);
     }
 }
