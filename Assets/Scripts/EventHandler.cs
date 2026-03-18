@@ -8,6 +8,9 @@ public static class EventHandler
     public static Action levelLoaded;//关卡加载事件
     public static Action breakTheWall;//玩家破坏墙单元格事件
     public static Action mapLoaded;//地图加载事件
+    public static Action<MapCellContent, Vector2Int> changeItem;//改变物品事件
+    public static Action<Vector2Int> passTheWall;//玩家穿墙单元格事件
+
 
     public static void CallMouseLeftClick(Vector2 position)//调用鼠标点击左键事件
     {
@@ -24,5 +27,13 @@ public static class EventHandler
     public static void CallMapLoaded()//调用地图加载事件
     {
         mapLoaded?.Invoke();
+    }
+    public static void CallChangeItem(MapCellContent mapCellContent, Vector2Int position)//调用改变物品事件
+    {
+        changeItem?.Invoke(mapCellContent, position);
+    }
+    public static void CallPassTheWall(Vector2Int position)//调用玩家穿墙单元格事件
+    {
+        passTheWall?.Invoke(position);
     }
 }

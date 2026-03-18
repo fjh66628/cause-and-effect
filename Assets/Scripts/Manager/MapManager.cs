@@ -7,7 +7,7 @@ using UnityEngine;
 [System.Serializable]
 public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
 {
-    MapCell[,] mapGrid ;//地图的网格数组
+    MapCell[,] mapGrid;//地图的网格数组
     public MapCell[,] getMapGrid => mapGrid;//地图的网格数组
     float cellWidth = 1.5f;//网格的宽度
     float cellHeight = 0.5f;//网格的高度
@@ -38,61 +38,62 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             Debug.LogError("LevelManager 或 GameManager 实例为空");
             return;
         }
-    
-        levelManagement = LevelManager.Instance.GetLevelManagement(GameManager.Instance.getChapterNumber,GameManager.Instance.getLevelNumber);
-    
-    if (levelManagement == null)
-    {
-        Debug.LogError("获取关卡管理失败");
-        return;
-    }
+
+        levelManagement = LevelManager.Instance.GetLevelManagement(GameManager.Instance.getChapterNumber, GameManager.Instance.getLevelNumber);
+
+        if (levelManagement == null)
+        {
+            Debug.LogError("获取关卡管理失败");
+            return;
+        }
         // 初始化地图网格数组
         mapGrid = new MapCell[levelManagement.getMapSize.x, levelManagement.getMapSize.y];
-        
+
         // 1. 先完整初始化整个数组
-        for(int x = 0; x < mapGrid.GetLength(0); x++)
+        for (int x = 0; x < mapGrid.GetLength(0); x++)
         {
-            for(int y = 0; y < mapGrid.GetLength(1); y++)
+            for (int y = 0; y < mapGrid.GetLength(1); y++)
             {
                 // 确保每个位置都有 MapCell 对象
                 if (mapGrid[x, y] == null)
                 {
                     mapGrid[x, y] = new MapCell();
                 }
-                            // 先全部设为 None
+                // 先全部设为 None
                 mapGrid[x, y].setCellContent(MapCellContent.None);
                 mapGrid[x, y].SetId("0");
             }
         }
 
-    
+
         // 3. 其余代码保持不变...
         playerPosition = levelManagement.getPlayerStartPosition;
         mapGrid[playerPosition.x, playerPosition.y].setStep(0);
-    
-        for(int x = 0; x < levelManagement.getUnitPositions.Count; x++)
+        mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Start);
+
+        for (int x = 0; x < levelManagement.getUnitPositions.Count; x++)
         {
             Vector2Int pos = levelManagement.getUnitPositions[x].getPosition;
             MapCellContent content = levelManagement.getUnitPositions[x].getMapCellContent;
-        
+
             // 确保坐标在数组范围内
             if (pos.x >= 0 && pos.x < 12 && pos.y >= 0 && pos.y < 12)
             {
                 mapGrid[pos.x, pos.y].setCellContent(content);
                 mapGrid[pos.x, pos.y].SetId(levelManagement.getUnitPositions[x].getId);
-            }   
+            }
             else
             {
                 Debug.LogError($"单位坐标超出范围: {pos}");
             }
         }
-    }   
+    }
 
 
-    public Vector2Int MoveDrection(Vector2 mousePosition , Vector2 playerPosition)//通过鼠标坐标获取移动方向，玩家的移动方式为网格移动
+    public Vector2Int MoveDrection(Vector2 mousePosition, Vector2 playerPosition)//通过鼠标坐标获取移动方向，玩家的移动方式为网格移动
     {
         Vector2 direction = mousePosition - playerPosition;
-        return math.abs(Vector2.Dot(direction, i)) > math.abs(Vector2.Dot(direction, j)) ? new Vector2Int((int)math.sign(Vector2.Dot(direction, i)), 0)  : new Vector2Int(0, (int)math.sign(Vector2.Dot(direction, j)));    
+        return math.abs(Vector2.Dot(direction, i)) > math.abs(Vector2.Dot(direction, j)) ? new Vector2Int((int)math.sign(Vector2.Dot(direction, i)), 0) : new Vector2Int(0, (int)math.sign(Vector2.Dot(direction, j)));
     }
 
     public void SetZeroPoint(Vector2 zeroPoint)//设置网格零点坐标
@@ -105,26 +106,26 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         // 步骤1: 计算理论上的m,n值（使用线性代数）
         float determinant = i.x * j.y - i.y * j.x;
-        if(zeroPoint == Vector2.zero)
+        if (zeroPoint == Vector2.zero)
         {
             Debug.LogError("网格零点坐标未设置");
             return Vector2Int.zero;
         }
         Vector2 l = position - zeroPoint - basePoint;//参考系转为地图的（0,0）点
         if (Mathf.Abs(determinant) < 0.001f) return Vector2Int.zero;
-        
+
         // 解线性方程组: l = m*i + n*j
         float m_exact = (l.x * j.y - l.y * j.x) / determinant;
         float n_exact = (i.x * l.y - i.y * l.x) / determinant;
-        
+
         // 步骤2: 四舍五入得到初始候选点
         int m_round = Mathf.RoundToInt(m_exact);
         int n_round = Mathf.RoundToInt(n_exact);
-        
+
         // 步骤3: 在3x3邻域内搜索最优解
         Vector2Int bestGrid = new Vector2Int(m_round, n_round);
         float minError = float.MaxValue;
-        
+
         // 搜索范围：中心点及其周围8个点
         for (int dm = -1; dm <= 1; dm++)
         {
@@ -132,14 +133,14 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             {
                 int test_m = m_round + dm;
                 int test_n = n_round + dn;
-                
+
                 // 计算网格点坐标
                 Vector2 gridPoint = test_m * i + test_n * j;
-                
+
                 // 计算误差向量的平方长度（避免开方运算，提高性能）
                 Vector2 error = l - gridPoint;
                 float errorSqr = error.x * error.x + error.y * error.y;
-                
+
                 if (errorSqr < minError)
                 {
                     minError = errorSqr;
@@ -147,7 +148,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
                 }
             }
         }
-        
+
         return bestGrid;
     }
 
@@ -157,7 +158,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         return GetWorldPosition(playerPosition);
     }
-    
+
     public Vector2 GetWorldPosition(Vector2Int gridPosition)//通过网格坐标获取世界坐标
     {
         return zeroPoint + basePoint + (float)gridPosition.x * i + (float)gridPosition.y * j;
@@ -165,12 +166,12 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     public Vector2 GetWorldPosition(MapCellContent mapCellContent)//通过网格内容获取世界坐标
     {
         return GetWorldPosition(FindGridPosition(mapCellContent)[0]);
-        
+
     }
-    public Vector2 GetWorldPosition(MapCellContent mapCellContent , int i)//通过网格内容获取世界坐标
+    public Vector2 GetWorldPosition(MapCellContent mapCellContent, int i)//通过网格内容获取世界坐标
     {
         return GetWorldPosition(FindGridPosition(mapCellContent)[i]);
-        
+
     }
 
     public List<Vector2Int> FindGridPosition(MapCellContent mapCellContent)//查找在地图网格中的坐标
@@ -192,68 +193,68 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
 
     public void ChangePlayerPosition(Vector2Int position)//改变玩家在地图中的坐标
     {
-        if(playerPosition == new Vector2Int(-1, -1))
+        if (playerPosition == new Vector2Int(-1, -1))
         {
             Debug.LogError("玩家在地图中不存在");
             return;
         }
-        if(position.x + playerPosition.x < 0 || position.x + playerPosition.x >= mapGrid.GetLength(0) || position.y + playerPosition.y < 0 || position.y + playerPosition.y >= mapGrid.GetLength(1))
+        if (position.x + playerPosition.x < 0 || position.x + playerPosition.x >= mapGrid.GetLength(0) || position.y + playerPosition.y < 0 || position.y + playerPosition.y >= mapGrid.GetLength(1))
         {
             LeaveTheMap();
             return;
         }
-        if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.None)
+        if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.None)
         {
             PlayerMove(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.End)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.End)
         {
             ReachTheEnd();
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall)
         {
             ToTheWall(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_singleuse)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_singleuse)
         {
             ToTheDoorSingleUse(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Collapse)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Collapse)
         {
             ToTheCollapse(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall_unbreakable)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall_unbreakable)
         {
-            ToTheWallUnbreakable();
+            ToTheWallUnbreakable(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Water)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Water)
         {
             ToTheWater(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Key)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Key)
         {
             ToTheKey(position);
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_locked)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_locked)
         {
             ToTheDoorClosed();
         }
-        else if(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_opened)
+        else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Door_opened)
         {
             ToTheDoorOpened(position);
         }
-        else 
+        else
         {
             Debug.LogWarning("玩家移动到了已有物品的单元格");
         }
-    
+
     }
 
     void PlayerMove(Vector2Int position)//玩家移动到新的单元格
     {
-            MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
-            mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setStep(playerCell.getStep + 1);//将玩家移动到新的单元格的步数设置为玩家所在单元格的步数加一
-            playerPosition=position+playerPosition;//将玩家移动到新的单元格 
+        MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
+        mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setStep(playerCell.getStep + 1);//将玩家移动到新的单元格的步数设置为玩家所在单元格的步数加一
+        playerPosition = position + playerPosition;//将玩家移动到新的单元格 
     }
 
 
@@ -263,19 +264,25 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     }
     void ReachTheEnd()//玩家到达目标单元格
     {
-        if(GameManager.Instance.ReachTheEnd() == false)//玩家到达目标单元格
+        if (GameManager.Instance.ReachTheEnd() == false)//玩家到达目标单元格
         {
-                playerPosition = levelManagement.getPlayerStartPosition;
+            playerPosition = levelManagement.getPlayerStartPosition;
         }
         Debug.Log("玩家到达了目标单元格");
     }
 
     void ToTheWall(Vector2Int position)//玩家到达了墙单元格
     {
-        if(GameManager.Instance.getPlayerState == PlayerState.BreakWall)//如果玩家可以破坏墙单元格
+
+        if (GameManager.Instance.getPlayerState == PlayerState.BreakWall)//如果玩家可以破坏墙单元格
         {
             EventHandler.CallBreakTheWall();//调用玩家破坏墙单元格事件
             StartCoroutine(BreakTheWallAnimation(position));//玩家破坏墙单元格动画
+        }
+        else if (GameManager.Instance.getPlayerState == PlayerState.PassWall)//如果玩家可以穿墙单元格
+        {
+            PlayerMove(position);//玩家移动到新的单元格
+            EventHandler.CallPassTheWall(playerPosition);//调用玩家穿墙单元格事件
         }
         else
         {
@@ -285,15 +292,17 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     void ToTheDoorSingleUse(Vector2Int position)//玩家到达了一次性门单元格
     {
         PlayerMove(position);//玩家移动到新的单元格
-        if(GameManager.Instance.getPlayerState != PlayerState.Fly)//如果玩家可以破坏墙单元格
+        if (GameManager.Instance.getPlayerState != PlayerState.Fly)//如果玩家可以破坏墙单元格
         {
-            mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setCellContent(MapCellContent.Collapse);//将一次性门单元格设置为塌陷单元格
+            mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Collapse);//将一次性门单元格设置为塌陷单元格
+            EventHandler.CallChangeItem(MapCellContent.Collapse, playerPosition);//调用改变物品事件
+            Debug.LogWarning("玩家到达了一次性门单元格,地面塌陷给予提示，危险快走");
         }
         Debug.LogWarning("玩家通过了一次性门单元格");
     }
     void ToTheCollapse(Vector2Int position)//玩家到达了塌陷单元格
     {
-        if(GameManager.Instance.getPlayerState == PlayerState.Fly)//如果玩家是飞行状态
+        if (GameManager.Instance.getPlayerState == PlayerState.Fly)//如果玩家是飞行状态
         {
             PlayerMove(position);//玩家移动到新的单元格
         }
@@ -302,13 +311,21 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             Debug.LogWarning("玩家不能到达塌陷单元格");
         }
     }
-    void ToTheWallUnbreakable()//玩家到达了不可破坏的墙单元格
+    void ToTheWallUnbreakable(Vector2Int position)//玩家到达了不可破坏的墙单元格
     {
-        Debug.LogWarning("玩家到达了不可破坏的墙单元格");
+        if (GameManager.Instance.getPlayerState == PlayerState.PassWall)//如果玩家可以穿墙单元格
+        {
+            PlayerMove(position);//玩家移动到新的单元格
+            EventHandler.CallPassTheWall(playerPosition);//调用玩家穿墙单元格事件
+        }
+        else
+        {
+            Debug.LogWarning("玩家到达了不可破坏的墙单元格");
+        }
     }
     void ToTheWater(Vector2Int position)//玩家到达了水单元格
     {
-        if(GameManager.Instance.getPlayerState == PlayerState.Fly)//如果玩家是飞行状态
+        if (GameManager.Instance.getPlayerState == PlayerState.Fly)//如果玩家是飞行状态
         {
             PlayerMove(position);//玩家移动到新的单元格
         }
@@ -344,19 +361,21 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
 
     void ChangeTheDoorState(string keyId)//改变门单元格的状态
     {
-        for(int i = 0; i < mapGrid.GetLength(0); i++)
+        for (int i = 0; i < mapGrid.GetLength(0); i++)
         {
-            for(int j = 0; j < mapGrid.GetLength(1); j++)
+            for (int j = 0; j < mapGrid.GetLength(1); j++)
             {
-                if(mapGrid[i, j].getId == keyId)
+                if (mapGrid[i, j].getId == keyId)
                 {
-                    if(mapGrid[i, j].getCellContent == MapCellContent.Door_locked)
+                    if (mapGrid[i, j].getCellContent == MapCellContent.Door_locked)
                     {
+                        EventHandler.CallChangeItem(MapCellContent.Door_opened, new Vector2Int(i, j));//调用改变物品事件
                         mapGrid[i, j].setCellContent(MapCellContent.Door_opened);//将关闭的门单元格设置为开启的门单元格
                         Debug.LogWarning("玩家改变了关闭的单元的门单元格");
                     }
-                    else if(mapGrid[i, j].getCellContent == MapCellContent.Door_opened)
+                    else if (mapGrid[i, j].getCellContent == MapCellContent.Door_opened)
                     {
+                        EventHandler.CallChangeItem(MapCellContent.Door_locked, new Vector2Int(i, j));//调用改变物品事件
                         mapGrid[i, j].setCellContent(MapCellContent.Door_locked);//将开启的门单元格设置为关闭的门单元格
                         Debug.LogWarning("玩家改变了开启的单元的门单元格");
                     }

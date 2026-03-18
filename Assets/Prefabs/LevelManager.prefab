@@ -44,9 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4d61e75442b8764fa175e3bf69e1bc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelNumber: 1
-  levelManagements:
-  - playerStartPosition: {x: 0, y: 0}
-    unitPositions:
-    - mapCellContent: 3
-      position: {x: 3, y: 3}
+  Chapter:
+  - levelManagements:
+    - playerStartPosition: {x: 0, y: 0}
+      unitPositions: []
+      mapSize: {x: 0, y: 0}
+      endStepCount: 0
+  - levelManagements: []

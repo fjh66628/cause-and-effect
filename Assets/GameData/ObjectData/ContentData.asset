@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faf68422f3eeeb341b23a37bd78828c3, type: 3}
   m_Name: ContentData
   m_EditorClassIdentifier: 
-  mapCellContentList:
-  - mapCellContent: 0
-    detail: 
-    contentIcon: {fileID: 0}
+  cardList:
+  - playerState: 0
+    cardSprite: {fileID: 0}
+    cardDescription: 
+    cardName: 
