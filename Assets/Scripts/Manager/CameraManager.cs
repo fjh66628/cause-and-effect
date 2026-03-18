@@ -4,6 +4,14 @@ using UnityEngine;
 [System.Serializable]
 public class CameraManager : SingletonMono<CameraManager>
 {
+    void OnEnable()
+    {
+        EventHandler.levelLoaded += RefreshCamera;//添加关卡加载事件监听
+    }
+    void OnDisable()
+    {
+        EventHandler.levelLoaded -= RefreshCamera;//移除关卡加载事件监听
+    }
     [SerializeField]float t = 0.5f;//相机跟随玩家的速度
     private Camera mainCamera;//相机
     public Camera MainCamera
@@ -38,8 +46,17 @@ public class CameraManager : SingletonMono<CameraManager>
 
     void FixedUpdate()
     {
-        MapManager mapManager = FindObjectOfType<MapManager>();
+        if(!mainCamera)
+        {
+            return;
+        }
+        PlayerMove playerMove = FindObjectOfType<PlayerMove>();
+        if(playerMove == null)
+        {
+
+            return;
+        }
         //相机跟随玩家
-        MainCamera.transform.position = new Vector3(t*mapManager.GetPlayerWorldPosition().x, t*mapManager.GetPlayerWorldPosition().y, MainCamera.transform.position.z);
+        MainCamera.transform.position = new Vector3(t*playerMove.transform.position.x, t*playerMove.transform.position.y, MainCamera.transform.position.z);
     }
 }

@@ -42,33 +42,32 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
     {
         EventHandler.levelLoaded -= LoadAllItems;
     }
-    void Start()
-    {
-        LoadAllItems();
-    }
 
     void LoadAllItems()
     {
+        StartCoroutine(LoadItem());
+    }
+
+    IEnumerator LoadItem()//加载物品
+    {
+        itemDatas.Clear();
+        yield return null;
         mapManager = FindObjectOfType<MapManager>();
         if(mapManager == null)
         {
             Debug.LogError("MapManager not found");
-            return;
         }
-        for(int x = 0; x < mapManager.getMapGrid.GetLength(0); x++)
+        foreach(MapCellContent mapCellContent in System.Enum.GetValues(typeof(MapCellContent)))
         {
-            for(int y = 0; y < mapManager.getMapGrid.GetLength(1); y++)
+            if(mapCellContent != MapCellContent.None)
             {
-                MapCellContent mapCellContent = mapManager.getMapGrid[x,y].getCellContent;
-                if(mapCellContent != MapCellContent.None)
-                {
-                    CreatItem(mapCellContent);
-                    //渲染物品
-                }
+                CreatItem(mapCellContent);
+                //渲染物品
             }
         }
         //加载所有物品
     }
+
     void CreatItem(MapCellContent mapCellContent)//根据物品种类创建物品
     {
         prefabMapping prefabMapping = itemPrefabs.Find(x => x.getMapCellContent == mapCellContent);
@@ -77,11 +76,28 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             Debug.LogError("物品" + mapCellContent + "的预制体未找到");
             return;
         }
-        GameObject item = Instantiate(prefabMapping.getItemPrefab, mapManager.GetWorldPosition(mapCellContent), Quaternion.identity);
-        item.name = mapCellContent.ToString();
-        string itemID = GetItemID(mapCellContent, mapManager.FindGridPosition(mapCellContent));
-        itemDatas.Add(itemID, new ItemData(itemID,item));
+        List<Vector2Int> itemsPositions=mapManager.FindGridPosition(mapCellContent);
+        foreach(Vector2Int position in itemsPositions)
+        {
+            if(mapManager.getMapGrid[position.x, position.y].getId == "0"||mapManager.getMapGrid[position.x, position.y].getId == "")
+            {    
+
+                GameObject item = Instantiate(prefabMapping.getItemPrefab, mapManager.GetWorldPosition(position), Quaternion.identity);
+                string itemID = GetItemID(mapCellContent, position);
+                itemDatas.Add(itemID, new ItemData(itemID,item));
+            }
+            else
+            {
+
+                GameObject item = Instantiate(prefabMapping.getItemPrefab, mapManager.GetWorldPosition(position), Quaternion.identity);
+                SetItemDefaultColor(item, mapManager.getMapGrid[position.x, position.y].getId);
+                string itemID = GetItemID(mapCellContent, position);
+                itemDatas.Add(itemID, new ItemData(itemID,item));
+            }
+        }
     }
+
+
 
     string GetItemID(MapCellContent mapCellContent, Vector2Int position)//根据物品种类获取物品ID
     {
@@ -94,7 +110,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             if (itemData.getItemObject != null)
             {
                 Destroy(itemData.getItemObject);
-                Debug.Log($"卸载物品: {itemId}");
+
             }
             
             itemDatas.Remove(itemId);
@@ -103,5 +119,42 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         
         Debug.LogWarning($"未找到物品ID: {itemId}");
         return false;
+    }
+
+    void SetItemDefaultColor(GameObject item, string itemID)//设置物品默认颜色
+    {
+        Color defaultColor = GetDefaultColor(itemID);
+
+        SetItemColor(item,defaultColor);
+    }
+    Color GetDefaultColor(string itemID)//获取物品默认颜色
+    {
+        if (itemID.Length != 3)
+        {
+            Debug.LogError("物品 ID" +itemID+" 格式错误，必须为3位");
+            return Color.white;
+        }
+        float r = int.Parse(itemID[0].ToString());
+        float g = int.Parse(itemID[1].ToString());
+        float b = int.Parse(itemID[2].ToString());
+        return new Color((155f+r*10)/255f,(155f+g*10)/255f , (155f+g*10f)/255f);
+    }
+    void SetItemColor(GameObject item, Color color)//设置物品颜色
+    {
+        if (item == null) return;
+        
+        // 设置当前物体的SpriteRenderer颜色
+        SpriteRenderer spriteRenderer = item.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = color;
+        }
+        
+        // 递归设置所有子物体
+        foreach (SpriteRenderer childSpriteRenderer in item.GetComponentsInChildren<SpriteRenderer>())
+        {
+            childSpriteRenderer.color = color;
+
+        }
     }
 }

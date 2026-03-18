@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-enum PlayerState//玩家状态
+public enum PlayerState//玩家状态
 {
+    Stand,
     Fly,//飞行
-    Opening,//打开通路
+    BreakWall,//破坏墙单元格
+
 }
