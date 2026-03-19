@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+
 public enum PlayerState//玩家状态
 {
     Stand,

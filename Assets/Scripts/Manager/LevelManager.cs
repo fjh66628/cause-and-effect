@@ -27,7 +27,6 @@ public class CardDataManagement//关卡的卡牌内容
     [Header("第几周目获得")]
     [SerializeField] private int round = 1;//第几回合获得
     public int getRound => round;//获取第几回合获得
-
 }
 
 [System.Serializable]
@@ -43,6 +42,9 @@ public class LevelManagement//储存关卡信息的数据结构
     [SerializeField] private int endStepCount = 1;//需要走过几次终点
     [Header("关卡的卡牌内容")]
     [SerializeField] private List<CardDataManagement> cardData = new List<CardDataManagement>();//关卡的卡牌内容
+    [Header("是否为塌陷关卡")]
+    [SerializeField] private bool isCollapse = false;//是否为塌陷关卡
+    public bool getIsCollapse => isCollapse;//获取是否为塌陷关卡
     public int getEndStepCount => endStepCount;//获取需要走过几次终点
     public Vector2Int getMapSize => mapSize;//获取地图大小
     public List<UnitPosition> getUnitPositions => unitPositions;//获取其他单位位置
@@ -56,6 +58,11 @@ public class ChapterManagement//储存章节信息的数据结构
     [SerializeField] private List<LevelManagement> levelManagements = new List<LevelManagement>();//关卡信息
     public List<LevelManagement> getLevelManagement => levelManagements;//获取关卡信息
 }
+
+
+
+
+
 [System.Serializable]
 public class LevelManager : SingletonMono<LevelManager>
 {

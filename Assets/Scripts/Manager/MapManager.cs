@@ -40,7 +40,15 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         }
 
         levelManagement = LevelManager.Instance.GetLevelManagement(GameManager.Instance.getChapterNumber, GameManager.Instance.getLevelNumber);
-
+        bool isCollapse = levelManagement.getIsCollapse;
+        if (isCollapse)
+        {
+            Debug.Log("当前关卡为塌陷关卡");
+        }
+        else
+        {
+            Debug.Log("当前关卡为普通关卡");
+        }
         if (levelManagement == null)
         {
             Debug.LogError("获取关卡管理失败");
@@ -60,7 +68,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
                     mapGrid[x, y] = new MapCell();
                 }
                 // 先全部设为 None
-                mapGrid[x, y].setCellContent(MapCellContent.None);
+                mapGrid[x, y].setCellContent(!isCollapse ? MapCellContent.None : MapCellContent.Door_singleuse);
                 mapGrid[x, y].SetId("0");
             }
         }
@@ -203,7 +211,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             LeaveTheMap();
             return;
         }
-        if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.None)
+        if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.None || mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Start)
         {
             PlayerMove(position);
         }

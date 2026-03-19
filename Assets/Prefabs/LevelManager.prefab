@@ -50,4 +50,5 @@ MonoBehaviour:
       unitPositions: []
       mapSize: {x: 0, y: 0}
       endStepCount: 0
-  - levelManagements: []
+      cardData: []
+      isCollapse: 0
