@@ -38,10 +38,11 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _BaseStarSize: 0.1
+    - _BaseStarSize: 0.118
     - _ColorVariation: 0.7
-    - _GridSize: 50
-    - _StarDensity: 0.054
+    - _GridSize: 88.1
+    - _MovingSpeed: 0.00295
+    - _StarDensity: 0.022
     - _TwinkleSpeed: 4.42
     m_Colors:
     - _BackgroundColor: {r: 0.049999982, g: 0.049999982, b: 0.09999997, a: 1}
