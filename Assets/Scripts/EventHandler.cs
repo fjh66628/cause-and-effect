@@ -10,10 +10,6 @@ public static class EventHandler
     public static Action mapLoaded;//地图加载事件
     public static Action<MapCellContent, Vector2Int> changeItem;//改变物品事件
     public static Action<Vector2Int> passTheWall;//玩家穿墙单元格事件
-    public static Action<CardData> playerUseSkill;//玩家使用技能事件
-    public static Action updateCard;//更新卡牌数据事件
-    public static Action playerMove;//改变玩家位置事件
-    public static Action playerStand;//玩家退出特殊状态事件
 
 
     public static void CallMouseLeftClick(Vector2 position)//调用鼠标点击左键事件
@@ -39,21 +35,5 @@ public static class EventHandler
     public static void CallPassTheWall(Vector2Int position)//调用玩家穿墙单元格事件
     {
         passTheWall?.Invoke(position);
-    }
-    public static void CallPlayerUseSkill(CardData card)//调用玩家使用技能事件
-    {
-        playerUseSkill?.Invoke(card);
-    }
-    public static void CallUpdateCard()//调用更新卡牌数据事件
-    {
-        updateCard?.Invoke();
-    }
-    public static void CallPlayerMove()//调用改变玩家位置事件
-    {
-        playerMove?.Invoke();
-    }
-    public static void CallPlayerStand()//调用玩家退出特殊状态事件
-    {
-        playerStand?.Invoke();
     }
 }
