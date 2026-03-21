@@ -23,10 +23,12 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     void OnEnable()
     {
         EventHandler.levelLoaded += UpdateMapInfo;//注册关卡加载事件
+        EventHandler.playerStand += CheckPlayerPosition;//注册判断玩家在哪个位置事件
     }
     void OnDisable()
     {
         EventHandler.levelLoaded -= UpdateMapInfo;//注销关卡加载事件
+        EventHandler.playerStand -= CheckPlayerPosition;//注销判断玩家在哪个位置事件
     }
 
 
@@ -263,6 +265,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
         mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setStep(playerCell.getStep + 1);//将玩家移动到新的单元格的步数设置为玩家所在单元格的步数加一
         playerPosition = position + playerPosition;//将玩家移动到新的单元格 
+        EventHandler.CallPlayerMove();//调用改变玩家位置事件
     }
 
 
@@ -389,6 +392,24 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
                     }
                 }
             }
+        }
+    }
+    void CheckPlayerPosition()//判断玩家在哪个位置
+    {
+        if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Collapse)//如果玩家在塌陷单元格
+        {
+            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
+            Debug.LogWarning("玩家在塌陷单元格");
+        }
+        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Water)//如果玩家在水单元格
+        {
+            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
+            Debug.LogWarning("玩家在水单元格");
+        }
+        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.None)//如果玩家在空单元格
+        {
+            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
+            Debug.LogWarning("玩家在空单元格");
         }
     }
 }
