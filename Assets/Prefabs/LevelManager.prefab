@@ -47,8 +47,529 @@ MonoBehaviour:
   Chapter:
   - levelManagements:
     - playerStartPosition: {x: 0, y: 0}
-      unitPositions: []
-      mapSize: {x: 0, y: 0}
-      endStepCount: 0
+      unitPositions:
+      - mapCellContent: 10
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 6
+        position: {x: 1, y: 1}
+        id: 
+      mapSize: {x: 2, y: 2}
+      endStepCount: 2
       cardData: []
+      isCollapse: 0
+    - playerStartPosition: {x: 0, y: 0}
+      unitPositions:
+      - mapCellContent: 10
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 6
+        position: {x: 4, y: 4}
+        id: 
+      - mapCellContent: 2
+        position: {x: 0, y: 2}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 0}
+        id: 
+      - mapCellContent: 5
+        position: {x: 1, y: 1}
+        id: 
+      - mapCellContent: 5
+        position: {x: 1, y: 3}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 1}
+        id: 
+      - mapCellContent: 5
+        position: {x: 2, y: 3}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 2}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 3}
+        id: 
+      mapSize: {x: 5, y: 5}
+      endStepCount: 2
+      cardData: []
+      isCollapse: 0
+    - playerStartPosition: {x: 0, y: 0}
+      unitPositions:
+      - mapCellContent: 10
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 6
+        position: {x: 6, y: 0}
+        id: 
+      - mapCellContent: 2
+        position: {x: 0, y: 2}
+        id: 
+      - mapCellContent: 2
+        position: {x: 0, y: 4}
+        id: 
+      - mapCellContent: 5
+        position: {x: 0, y: 5}
+        id: 
+      - mapCellContent: 2
+        position: {x: 1, y: 1}
+        id: 
+      - mapCellContent: 5
+        position: {x: 1, y: 3}
+        id: 
+      - mapCellContent: 2
+        position: {x: 1, y: 5}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 0}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 1}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 2}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 4}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 5}
+        id: 
+      - mapCellContent: 2
+        position: {x: 2, y: 6}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 0}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 2}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 3}
+        id: 
+      - mapCellContent: 5
+        position: {x: 3, y: 4}
+        id: 
+      - mapCellContent: 2
+        position: {x: 3, y: 1}
+        id: 
+      - mapCellContent: 2
+        position: {x: 3, y: 5}
+        id: 
+      - mapCellContent: 2
+        position: {x: 4, y: 0}
+        id: 
+      - mapCellContent: 2
+        position: {x: 4, y: 1}
+        id: 
+      - mapCellContent: 2
+        position: {x: 4, y: 2}
+        id: 
+      - mapCellContent: 2
+        position: {x: 4, y: 4}
+        id: 
+      - mapCellContent: 2
+        position: {x: 4, y: 5}
+        id: 
+      - mapCellContent: 2
+        position: {x: 4, y: 6}
+        id: 
+      - mapCellContent: 2
+        position: {x: 5, y: 1}
+        id: 
+      - mapCellContent: 2
+        position: {x: 5, y: 5}
+        id: 
+      - mapCellContent: 5
+        position: {x: 5, y: 3}
+        id: 
+      - mapCellContent: 2
+        position: {x: 6, y: 2}
+        id: 
+      - mapCellContent: 2
+        position: {x: 6, y: 4}
+        id: 
+      - mapCellContent: 5
+        position: {x: 6, y: 5}
+        id: 
+      mapSize: {x: 7, y: 7}
+      endStepCount: 3
+      cardData: []
+      isCollapse: 0
+  - levelManagements:
+    - playerStartPosition: {x: 0, y: 3}
+      unitPositions:
+      - mapCellContent: 10
+        position: {x: 0, y: 3}
+        id: 
+      - mapCellContent: 1
+        position: {x: 3, y: 0}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 5}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 2}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 3}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 6}
+        id: 
+      - mapCellContent: 3
+        position: {x: 4, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 4, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 4, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 4, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 5, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 5, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 5, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 5, y: 5}
+        id: 
+      - mapCellContent: 2
+        position: {x: 0, y: 1}
+        id: 
+      - mapCellContent: 2
+        position: {x: 1, y: 3}
+        id: 
+      - mapCellContent: 2
+        position: {x: 0, y: 5}
+        id: 
+      - mapCellContent: 6
+        position: {x: 6, y: 3}
+        id: 
+      mapSize: {x: 7, y: 7}
+      endStepCount: 3
+      cardData:
+      - cardData: 1
+        round: 0
+      - cardData: 2
+        round: 0
+      - cardData: 3
+        round: 0
+      isCollapse: 0
+    - playerStartPosition: {x: 0, y: 3}
+      unitPositions:
+      - mapCellContent: 2
+        position: {x: 0, y: 1}
+        id: 
+      - mapCellContent: 1
+        position: {x: 3, y: 0}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 5}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 2}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 3}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      mapSize: {x: 7, y: 7}
+      endStepCount: 4
+      cardData:
+      - cardData: 1
+        round: 0
+      - cardData: 2
+        round: 0
+      - cardData: 3
+        round: 0
+      isCollapse: 0
+    - playerStartPosition: {x: 0, y: 3}
+      unitPositions:
+      - mapCellContent: 2
+        position: {x: 0, y: 1}
+        id: 
+      - mapCellContent: 1
+        position: {x: 3, y: 0}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 5}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 2}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 3}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      mapSize: {x: 7, y: 7}
+      endStepCount: 4
+      cardData:
+      - cardData: 1
+        round: 0
+      - cardData: 2
+        round: 0
+      - cardData: 3
+        round: 0
+      isCollapse: 0
+  - levelManagements:
+    - playerStartPosition: {x: 0, y: 3}
+      unitPositions:
+      - mapCellContent: 2
+        position: {x: 0, y: 1}
+        id: 
+      - mapCellContent: 1
+        position: {x: 3, y: 0}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 1, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 2}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 4}
+        id: 
+      - mapCellContent: 3
+        position: {x: 2, y: 5}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 1}
+        id: 
+      - mapCellContent: 3
+        position: {x: 3, y: 5}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 2}
+        id: 
+      - mapCellContent: 4
+        position: {x: 3, y: 3}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      - mapCellContent: 0
+        position: {x: 0, y: 0}
+        id: 
+      mapSize: {x: 7, y: 7}
+      endStepCount: 4
+      cardData:
+      - cardData: 1
+        round: 0
+      - cardData: 2
+        round: 0
+      - cardData: 3
+        round: 0
       isCollapse: 0

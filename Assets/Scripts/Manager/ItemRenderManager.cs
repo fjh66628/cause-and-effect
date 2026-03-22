@@ -93,15 +93,12 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             return;
         }
         List<Vector2Int> itemsPositions = mapManager.FindGridPosition(mapCellContent);
-        GameObject targetSceneRoot = GameObject.Find($"ChapterRoot"); // 找到目标场景的根节点
         foreach (Vector2Int position in itemsPositions)
         {
             if (mapManager.getMapGrid[position.x, position.y].getId == "0" || mapManager.getMapGrid[position.x, position.y].getId == "")
             {
 
                 GameObject item = Instantiate(prefabMapping.getItemPrefab, mapManager.GetWorldPosition(position), Quaternion.identity);
-                item.transform.SetParent(targetSceneRoot.transform, false);
-                SetItemDefaultColor(item, mapManager.getMapGrid[position.x, position.y].getId);
                 string itemID = GetItemID(mapCellContent, position);
                 itemDatas.Add(itemID, new ItemData(itemID, item));
             }
@@ -213,14 +210,14 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         {
             Debug.Log($"成功卸载 {fromState} 物品");
         }
-        GameObject targetSceneRoot = GameObject.Find($"ChapterRoot"); // 找到目标场景的根节点
+
         // 2. 创建新物品    
         prefabMapping newItemPrefab = itemPrefabs.Find(x => x.getMapCellContent == toState);
         if (newItemPrefab != null)
         {
             string toId = GetItemID(toState, position);
             GameObject newItem = Instantiate(newItemPrefab.getItemPrefab, mapManager.GetWorldPosition(position), Quaternion.identity);
-            newItem.transform.SetParent(targetSceneRoot.transform, false);
+
             // 3. 设置颜色（根据地图网格中的ID）
             string colorId = mapManager.getMapGrid[position.x, position.y].getId;
             SetItemDefaultColor(newItem, colorId);
@@ -228,6 +225,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             // 4. 添加到字典
             itemDatas.Add(toId, new ItemData(toId, newItem));
 
+            Debug.Log($"成功创建 {toState} 物品，颜色ID: {colorId}");
         }
         else
         {
