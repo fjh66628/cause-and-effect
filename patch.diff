@@ -1,0 +1,3873 @@
+From 3a17fc31304dd00f4ca259374193902ad55bf0ee Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=E6=B2=83=E5=B8=83=E6=97=B6=E6=B2=99=E9=9B=95=5Cfjh?=
+ <3124256916@qq.com>
+Date: Sun, 22 Mar 2026 22:03:01 +0800
+Subject: [PATCH] =?UTF-8?q?=E5=8D=A1=E7=89=8C=E7=B3=BB=E7=BB=9F=E5=81=9A?=
+ =?UTF-8?q?=E5=AE=8C=E4=BA=86?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ Assets/GameData/ObjectData/ContentData.asset  |  16 +-
+ Assets/Prefabs/LevelManager.prefab            |   1 +
+ Assets/Prefabs/UI对象/UIManager.prefab        | 900 +++++++++++++++++-
+ Assets/Prefabs/UI对象/卡牌预制体.prefab       | 684 ++++++++++++-
+ Assets/Prefabs/场景对象/water.prefab          |   2 +-
+ Assets/Scenes/Chapter1Floor1.unity            | 532 ++++-------
+ Assets/Scenes/END.unity                       | 128 +++
+ Assets/Scenes/END.unity.meta                  |   7 +
+ Assets/Scenes/UI.unity                        | 195 +++-
+ Assets/Scripts/EventHandler.cs                |   5 +
+ Assets/Scripts/GameData/ItemData/MapCell.cs   |   9 +-
+ Assets/Scripts/Manager/GameManager.cs         | 178 +++-
+ Assets/Scripts/Manager/LevelManager.cs        |   3 +-
+ Assets/Scripts/Manager/MapManager.cs          |  13 +-
+ Assets/Scripts/Manager/UIManager.cs           | 142 ++-
+ Assets/Scripts/UIlogic/CardButton.cs          |   3 +-
+ Assets/Scripts/UIlogic/CardLogic.cs           | 325 ++++++-
+ Assets/Scripts/UIlogic/ChapterReminder.cs     |  23 +
+ .../Scripts/UIlogic/ChapterReminder.cs.meta   |  11 +
+ Assets/Scripts/UIlogic/Pause.cs               |  26 +
+ Assets/Scripts/UIlogic/Pause.cs.meta          |  11 +
+ Assets/Scripts/UIlogic/PauseButton.cs         |  17 +
+ Assets/Scripts/UIlogic/PauseButton.cs.meta    |  11 +
+ ProjectSettings/EditorBuildSettings.asset     |   3 +
+ 24 files changed, 2745 insertions(+), 500 deletions(-)
+ create mode 100644 Assets/Scenes/END.unity
+ create mode 100644 Assets/Scenes/END.unity.meta
+ create mode 100644 Assets/Scripts/UIlogic/ChapterReminder.cs
+ create mode 100644 Assets/Scripts/UIlogic/ChapterReminder.cs.meta
+ create mode 100644 Assets/Scripts/UIlogic/Pause.cs
+ create mode 100644 Assets/Scripts/UIlogic/Pause.cs.meta
+ create mode 100644 Assets/Scripts/UIlogic/PauseButton.cs
+ create mode 100644 Assets/Scripts/UIlogic/PauseButton.cs.meta
+
+diff --git a/Assets/GameData/ObjectData/ContentData.asset b/Assets/GameData/ObjectData/ContentData.asset
+index 3049374..6e18e0b 100644
+--- a/Assets/GameData/ObjectData/ContentData.asset
++++ b/Assets/GameData/ObjectData/ContentData.asset
+@@ -13,7 +13,15 @@ MonoBehaviour:
+   m_Name: ContentData
+   m_EditorClassIdentifier: 
+   cardList:
+-  - playerState: 0
+-    cardSprite: {fileID: 0}
+-    cardDescription: 
+-    cardName: 
++  - cardType: 1
++    cardSprite: {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
++    cardDescription: "\u98DE"
++    cardName: "\u98DE\u98DE"
++  - cardType: 3
++    cardSprite: {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
++    cardDescription: "\u7A7F"
++    cardName: "\u7A7F\u7A7F"
++  - cardType: 2
++    cardSprite: {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
++    cardDescription: "\u6253\u98DE"
++    cardName: "\u6253"
+diff --git a/Assets/Prefabs/LevelManager.prefab b/Assets/Prefabs/LevelManager.prefab
+index 2fe475d..111861c 100644
+--- a/Assets/Prefabs/LevelManager.prefab
++++ b/Assets/Prefabs/LevelManager.prefab
+@@ -44,6 +44,7 @@ MonoBehaviour:
+   m_Script: {fileID: 11500000, guid: e4d61e75442b8764fa175e3bf69e1bc5, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: 
++  cardData: {fileID: 0}
+   Chapter:
+   - levelManagements:
+     - playerStartPosition: {x: 0, y: 0}
+diff --git a/Assets/Prefabs/UI对象/UIManager.prefab b/Assets/Prefabs/UI对象/UIManager.prefab
+index 769a981..45b469d 100644
+--- a/Assets/Prefabs/UI对象/UIManager.prefab
++++ b/Assets/Prefabs/UI对象/UIManager.prefab
+@@ -237,6 +237,8 @@ GameObject:
+   - component: {fileID: 7005036997793460264}
+   - component: {fileID: 1616543982517925816}
+   - component: {fileID: 2811956069958652957}
++  - component: {fileID: 5724096895511793}
++  - component: {fileID: 3147299214794017383}
+   m_Layer: 5
+   m_Name: "\u6682\u505C"
+   m_TagString: Untagged
+@@ -301,6 +303,152 @@ MonoBehaviour:
+   m_FillOrigin: 0
+   m_UseSpriteMesh: 0
+   m_PixelsPerUnitMultiplier: 1
++--- !u!114 &5724096895511793
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4862443251592011199}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Navigation:
++    m_Mode: 3
++    m_WrapAround: 0
++    m_SelectOnUp: {fileID: 0}
++    m_SelectOnDown: {fileID: 0}
++    m_SelectOnLeft: {fileID: 0}
++    m_SelectOnRight: {fileID: 0}
++  m_Transition: 1
++  m_Colors:
++    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
++    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
++    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
++    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
++    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
++    m_ColorMultiplier: 1
++    m_FadeDuration: 0.1
++  m_SpriteState:
++    m_HighlightedSprite: {fileID: 0}
++    m_PressedSprite: {fileID: 0}
++    m_SelectedSprite: {fileID: 0}
++    m_DisabledSprite: {fileID: 0}
++  m_AnimationTriggers:
++    m_NormalTrigger: Normal
++    m_HighlightedTrigger: Highlighted
++    m_PressedTrigger: Pressed
++    m_SelectedTrigger: Selected
++    m_DisabledTrigger: Disabled
++  m_Interactable: 1
++  m_TargetGraphic: {fileID: 2811956069958652957}
++  m_OnClick:
++    m_PersistentCalls:
++      m_Calls:
++      - m_Target: {fileID: 3147299214794017383}
++        m_TargetAssemblyTypeName: Pause, Assembly-CSharp
++        m_MethodName: PauseGame
++        m_Mode: 1
++        m_Arguments:
++          m_ObjectArgument: {fileID: 0}
++          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
++          m_IntArgument: 0
++          m_FloatArgument: 0
++          m_StringArgument: 
++          m_BoolArgument: 0
++        m_CallState: 2
++--- !u!114 &3147299214794017383
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4862443251592011199}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 44716758dd7ea094ebe3fa354d15058f, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  pauseImage: {fileID: 106333184442247060}
++--- !u!1 &4917499743279721258
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 4875372912487110824}
++  - component: {fileID: 6938288294616044329}
++  - component: {fileID: 6311120737782201067}
++  m_Layer: 5
++  m_Name: GameObject
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &4875372912487110824
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4917499743279721258}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children:
++  - {fileID: 22860719044458511}
++  - {fileID: 7633527442862763145}
++  m_Father: {fileID: 6849543729029984293}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: 0, y: -530.91}
++  m_SizeDelta: {x: 100, y: 17.050049}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &6938288294616044329
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4917499743279721258}
++  m_CullTransparentMesh: 1
++--- !u!114 &6311120737782201067
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4917499743279721258}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 0}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_Sprite: {fileID: 0}
++  m_Type: 0
++  m_PreserveAspect: 0
++  m_FillCenter: 1
++  m_FillMethod: 4
++  m_FillAmount: 1
++  m_FillClockwise: 1
++  m_FillOrigin: 0
++  m_UseSpriteMesh: 0
++  m_PixelsPerUnitMultiplier: 1
+ --- !u!1 &5390202851118492768
+ GameObject:
+   m_ObjectHideFlags: 0
+@@ -313,6 +461,8 @@ GameObject:
+   - component: {fileID: 8874726958542633487}
+   - component: {fileID: 1592470212015964886}
+   - component: {fileID: 3076148198555005368}
++  - component: {fileID: 8641846468653873708}
++  - component: {fileID: 6991746325266739613}
+   m_Layer: 5
+   m_Name: "\u5361\u724C\u5BB9\u5668"
+   m_TagString: Untagged
+@@ -332,7 +482,7 @@ RectTransform:
+   m_LocalScale: {x: 1, y: 1, z: 1}
+   m_ConstrainProportionsScale: 0
+   m_Children: []
+-  m_Father: {fileID: 22860719044458511}
++  m_Father: {fileID: 4875372912487110824}
+   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+   m_AnchorMin: {x: 0.5, y: 0.5}
+   m_AnchorMax: {x: 0.5, y: 0.5}
+@@ -398,9 +548,49 @@ MonoBehaviour:
+   m_StartCorner: 0
+   m_StartAxis: 0
+   m_CellSize: {x: 200, y: 200}
+-  m_Spacing: {x: 50, y: 0}
++  m_Spacing: {x: 75, y: 0}
+   m_Constraint: 0
+   m_ConstraintCount: 2
++--- !u!223 &8641846468653873708
++Canvas:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 5390202851118492768}
++  m_Enabled: 1
++  serializedVersion: 3
++  m_RenderMode: 2
++  m_Camera: {fileID: 0}
++  m_PlaneDistance: 100
++  m_PixelPerfect: 0
++  m_ReceivesEvents: 1
++  m_OverrideSorting: 0
++  m_OverridePixelPerfect: 0
++  m_SortingBucketNormalizedSize: 0
++  m_VertexColorAlwaysGammaSpace: 0
++  m_AdditionalShaderChannelsFlag: 0
++  m_UpdateRectTransformForStandalone: 0
++  m_SortingLayerID: 0
++  m_SortingOrder: 0
++  m_TargetDisplay: 0
++--- !u!114 &6991746325266739613
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 5390202851118492768}
++  m_Enabled: 0
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_IgnoreReversedGraphics: 1
++  m_BlockingObjects: 0
++  m_BlockingMask:
++    serializedVersion: 2
++    m_Bits: 4294967295
+ --- !u!1 &5431813593613293008
+ GameObject:
+   m_ObjectHideFlags: 0
+@@ -447,7 +637,143 @@ MonoBehaviour:
+   m_Name: 
+   m_EditorClassIdentifier: 
+   cardData: []
++  isClicked: 0
+   card: {fileID: 782492957339143259, guid: 2c0fcc93b8a26f14db2d6c1f5695830b, type: 3}
++  dialogueContainer: {fileID: 0}
++--- !u!1 &5786815321262680306
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 5245723623231548921}
++  - component: {fileID: 526925733771484617}
++  - component: {fileID: 7852186642077700838}
++  m_Layer: 5
++  m_Name: Text (TMP)
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &5245723623231548921
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 5786815321262680306}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 1038864593318187027}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0, y: 0}
++  m_AnchorMax: {x: 1, y: 1}
++  m_AnchoredPosition: {x: 0, y: 0}
++  m_SizeDelta: {x: 0, y: 0}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &526925733771484617
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 5786815321262680306}
++  m_CullTransparentMesh: 1
++--- !u!114 &7852186642077700838
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 5786815321262680306}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_text: "\u9000\u51FA"
++  m_isRightToLeft: 0
++  m_fontAsset: {fileID: 11400000, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_sharedMaterial: {fileID: 3012593490416124421, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_fontSharedMaterials: []
++  m_fontMaterial: {fileID: 0}
++  m_fontMaterials: []
++  m_fontColor32:
++    serializedVersion: 2
++    rgba: 4281479730
++  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
++  m_enableVertexGradient: 0
++  m_colorMode: 3
++  m_fontColorGradient:
++    topLeft: {r: 1, g: 1, b: 1, a: 1}
++    topRight: {r: 1, g: 1, b: 1, a: 1}
++    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
++    bottomRight: {r: 1, g: 1, b: 1, a: 1}
++  m_fontColorGradientPreset: {fileID: 0}
++  m_spriteAsset: {fileID: 0}
++  m_tintAllSprites: 0
++  m_StyleSheet: {fileID: 0}
++  m_TextStyleHashCode: -1183493901
++  m_overrideHtmlColors: 0
++  m_faceColor:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontSize: 24
++  m_fontSizeBase: 24
++  m_fontWeight: 400
++  m_enableAutoSizing: 0
++  m_fontSizeMin: 18
++  m_fontSizeMax: 72
++  m_fontStyle: 0
++  m_HorizontalAlignment: 2
++  m_VerticalAlignment: 512
++  m_textAlignment: 65535
++  m_characterSpacing: 0
++  m_wordSpacing: 0
++  m_lineSpacing: 0
++  m_lineSpacingMax: 0
++  m_paragraphSpacing: 0
++  m_charWidthMaxAdj: 0
++  m_enableWordWrapping: 1
++  m_wordWrappingRatios: 0.4
++  m_overflowMode: 0
++  m_linkedTextComponent: {fileID: 0}
++  parentLinkedComponent: {fileID: 0}
++  m_enableKerning: 1
++  m_enableExtraPadding: 0
++  checkPaddingRequired: 0
++  m_isRichText: 1
++  m_parseCtrlCharacters: 1
++  m_isOrthographic: 1
++  m_isCullingEnabled: 0
++  m_horizontalMapping: 0
++  m_verticalMapping: 0
++  m_uvLineOffset: 0
++  m_geometrySortingOrder: 0
++  m_IsTextObjectScaleStatic: 0
++  m_VertexBufferAutoSizeReduction: 0
++  m_useMaxVisibleDescender: 1
++  m_pageToDisplay: 1
++  m_margin: {x: 0, y: 0, z: 0, w: 0}
++  m_isUsingLegacyAnimationComponent: 0
++  m_isVolumetricText: 0
++  m_hasFontAssetChanged: 0
++  m_baseMaterial: {fileID: 0}
++  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+ --- !u!1 &6069451716610885998
+ GameObject:
+   m_ObjectHideFlags: 0
+@@ -479,14 +805,13 @@ RectTransform:
+   m_LocalPosition: {x: 0, y: 0, z: 0}
+   m_LocalScale: {x: 1, y: 1, z: 1}
+   m_ConstrainProportionsScale: 0
+-  m_Children:
+-  - {fileID: 7633527442862763145}
+-  m_Father: {fileID: 6849543729029984293}
++  m_Children: []
++  m_Father: {fileID: 4875372912487110824}
+   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+   m_AnchorMin: {x: 0.5, y: 0.5}
+   m_AnchorMax: {x: 0.5, y: 0.5}
+-  m_AnchoredPosition: {x: 0, y: -5}
+-  m_SizeDelta: {x: 100, y: 32.546}
++  m_AnchoredPosition: {x: 0, y: -0.000061035156}
++  m_SizeDelta: {x: 100, y: 17.05}
+   m_Pivot: {x: 0.5, y: 0.5}
+ --- !u!222 &7057705709170775515
+ CanvasRenderer:
+@@ -509,15 +834,264 @@ MonoBehaviour:
+   m_Name: 
+   m_EditorClassIdentifier: 
+   m_Material: {fileID: 0}
+-  m_Color: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
++  m_Color: {r: 0.6415094, g: 0.6415094, b: 0.6415094, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_Sprite: {fileID: 0}
++  m_Type: 0
++  m_PreserveAspect: 0
++  m_FillCenter: 1
++  m_FillMethod: 4
++  m_FillAmount: 1
++  m_FillClockwise: 1
++  m_FillOrigin: 0
++  m_UseSpriteMesh: 0
++  m_PixelsPerUnitMultiplier: 1
++--- !u!114 &8632184864474414421
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6069451716610885998}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Navigation:
++    m_Mode: 3
++    m_WrapAround: 0
++    m_SelectOnUp: {fileID: 0}
++    m_SelectOnDown: {fileID: 0}
++    m_SelectOnLeft: {fileID: 0}
++    m_SelectOnRight: {fileID: 0}
++  m_Transition: 1
++  m_Colors:
++    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
++    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
++    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
++    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
++    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
++    m_ColorMultiplier: 1
++    m_FadeDuration: 0.1
++  m_SpriteState:
++    m_HighlightedSprite: {fileID: 0}
++    m_PressedSprite: {fileID: 0}
++    m_SelectedSprite: {fileID: 0}
++    m_DisabledSprite: {fileID: 0}
++  m_AnimationTriggers:
++    m_NormalTrigger: Normal
++    m_HighlightedTrigger: Highlighted
++    m_PressedTrigger: Pressed
++    m_SelectedTrigger: Selected
++    m_DisabledTrigger: Disabled
++  m_Interactable: 1
++  m_TargetGraphic: {fileID: 8447496486568178660}
++  m_OnClick:
++    m_PersistentCalls:
++      m_Calls:
++      - m_Target: {fileID: 2345146452061773102}
++        m_TargetAssemblyTypeName: CardButton, Assembly-CSharp
++        m_MethodName: OnClick
++        m_Mode: 1
++        m_Arguments:
++          m_ObjectArgument: {fileID: 0}
++          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
++          m_IntArgument: 0
++          m_FloatArgument: 0
++          m_StringArgument: 
++          m_BoolArgument: 0
++        m_CallState: 2
++--- !u!114 &2345146452061773102
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6069451716610885998}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 6fd29cb497f229344bd06053842a7458, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  isSelected: 0
++  image: {fileID: 0}
++  sprites:
++  - {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
++  - {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
++  hidePosition: {x: 0, y: -530}
++  expandPosition: {x: 0, y: -240}
++  cardData:
++    cardType: 0
++    cardSprite: {fileID: 0}
++    cardDescription: 
++    cardName: 
++  parent: {fileID: 6311120737782201067}
++--- !u!1 &6205699400379821688
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 1872650499262150676}
++  - component: {fileID: 4241875079238426213}
++  - component: {fileID: 106333184442247060}
++  - component: {fileID: 1364897378461486786}
++  m_Layer: 5
++  m_Name: "\u9000\u51FA\u80CC\u666F"
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 0
++--- !u!224 &1872650499262150676
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6205699400379821688}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children:
++  - {fileID: 1038864593318187027}
++  - {fileID: 7281324170760916711}
++  m_Father: {fileID: 6849543729029984293}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: -2.012, y: 3}
++  m_SizeDelta: {x: 1162.233, y: 510.212}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &4241875079238426213
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6205699400379821688}
++  m_CullTransparentMesh: 1
++--- !u!114 &106333184442247060
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6205699400379821688}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_Sprite: {fileID: 0}
++  m_Type: 0
++  m_PreserveAspect: 0
++  m_FillCenter: 1
++  m_FillMethod: 4
++  m_FillAmount: 1
++  m_FillClockwise: 1
++  m_FillOrigin: 0
++  m_UseSpriteMesh: 0
++  m_PixelsPerUnitMultiplier: 1
++--- !u!114 &1364897378461486786
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6205699400379821688}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: a370d0336f860c4429c117d30b1a0ba0, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  pause: {fileID: 3147299214794017383}
++--- !u!1 &6495051908251782836
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 7281324170760916711}
++  - component: {fileID: 1635002729373530525}
++  - component: {fileID: 6755044585848360100}
++  - component: {fileID: 5105901524165689781}
++  m_Layer: 5
++  m_Name: "\u91CD\u5F00\u6309\u94AE"
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &7281324170760916711
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6495051908251782836}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children:
++  - {fileID: 9062918239665773115}
++  m_Father: {fileID: 1872650499262150676}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: 306, y: -12}
++  m_SizeDelta: {x: 320.788, y: 133.595}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &1635002729373530525
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6495051908251782836}
++  m_CullTransparentMesh: 1
++--- !u!114 &6755044585848360100
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 6495051908251782836}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
+   m_RaycastTarget: 1
+   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+   m_Maskable: 1
+   m_OnCullStateChanged:
+     m_PersistentCalls:
+       m_Calls: []
+-  m_Sprite: {fileID: 0}
+-  m_Type: 0
++  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
++  m_Type: 1
+   m_PreserveAspect: 0
+   m_FillCenter: 1
+   m_FillMethod: 4
+@@ -526,13 +1100,13 @@ MonoBehaviour:
+   m_FillOrigin: 0
+   m_UseSpriteMesh: 0
+   m_PixelsPerUnitMultiplier: 1
+---- !u!114 &8632184864474414421
++--- !u!114 &5105901524165689781
+ MonoBehaviour:
+   m_ObjectHideFlags: 0
+   m_CorrespondingSourceObject: {fileID: 0}
+   m_PrefabInstance: {fileID: 0}
+   m_PrefabAsset: {fileID: 0}
+-  m_GameObject: {fileID: 6069451716610885998}
++  m_GameObject: {fileID: 6495051908251782836}
+   m_Enabled: 1
+   m_EditorHideFlags: 0
+   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+@@ -566,13 +1140,13 @@ MonoBehaviour:
+     m_SelectedTrigger: Selected
+     m_DisabledTrigger: Disabled
+   m_Interactable: 1
+-  m_TargetGraphic: {fileID: 8447496486568178660}
++  m_TargetGraphic: {fileID: 6755044585848360100}
+   m_OnClick:
+     m_PersistentCalls:
+       m_Calls:
+-      - m_Target: {fileID: 2345146452061773102}
+-        m_TargetAssemblyTypeName: CardButton, Assembly-CSharp
+-        m_MethodName: OnClick
++      - m_Target: {fileID: 1364897378461486786}
++        m_TargetAssemblyTypeName: PauseButton, Assembly-CSharp
++        m_MethodName: ResumeGameButton
+         m_Mode: 1
+         m_Arguments:
+           m_ObjectArgument: {fileID: 0}
+@@ -582,30 +1156,6 @@ MonoBehaviour:
+           m_StringArgument: 
+           m_BoolArgument: 0
+         m_CallState: 2
+---- !u!114 &2345146452061773102
+-MonoBehaviour:
+-  m_ObjectHideFlags: 0
+-  m_CorrespondingSourceObject: {fileID: 0}
+-  m_PrefabInstance: {fileID: 0}
+-  m_PrefabAsset: {fileID: 0}
+-  m_GameObject: {fileID: 6069451716610885998}
+-  m_Enabled: 1
+-  m_EditorHideFlags: 0
+-  m_Script: {fileID: 11500000, guid: 6fd29cb497f229344bd06053842a7458, type: 3}
+-  m_Name: 
+-  m_EditorClassIdentifier: 
+-  isSelected: 0
+-  image: {fileID: 0}
+-  sprites:
+-  - {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
+-  - {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
+-  hidePosition: {x: 0, y: 0}
+-  expandPosition: {x: 0, y: 0}
+-  cardData:
+-    cardType: 0
+-    cardSprite: {fileID: 0}
+-    cardDescription: 
+-    cardName: 
+ --- !u!1 &7339035511298293425
+ GameObject:
+   m_ObjectHideFlags: 0
+@@ -740,6 +1290,273 @@ MonoBehaviour:
+   m_hasFontAssetChanged: 0
+   m_baseMaterial: {fileID: 0}
+   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
++--- !u!1 &7384057974147620381
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 9062918239665773115}
++  - component: {fileID: 3672560108773828800}
++  - component: {fileID: 2993942282871502764}
++  m_Layer: 5
++  m_Name: Text (TMP)
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &9062918239665773115
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7384057974147620381}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 7281324170760916711}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0, y: 0}
++  m_AnchorMax: {x: 1, y: 1}
++  m_AnchoredPosition: {x: 0, y: 0}
++  m_SizeDelta: {x: 0, y: 0}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &3672560108773828800
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7384057974147620381}
++  m_CullTransparentMesh: 1
++--- !u!114 &2993942282871502764
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7384057974147620381}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_text: "\u91CD\u5F00"
++  m_isRightToLeft: 0
++  m_fontAsset: {fileID: 11400000, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_sharedMaterial: {fileID: 3012593490416124421, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_fontSharedMaterials: []
++  m_fontMaterial: {fileID: 0}
++  m_fontMaterials: []
++  m_fontColor32:
++    serializedVersion: 2
++    rgba: 4281479730
++  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
++  m_enableVertexGradient: 0
++  m_colorMode: 3
++  m_fontColorGradient:
++    topLeft: {r: 1, g: 1, b: 1, a: 1}
++    topRight: {r: 1, g: 1, b: 1, a: 1}
++    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
++    bottomRight: {r: 1, g: 1, b: 1, a: 1}
++  m_fontColorGradientPreset: {fileID: 0}
++  m_spriteAsset: {fileID: 0}
++  m_tintAllSprites: 0
++  m_StyleSheet: {fileID: 0}
++  m_TextStyleHashCode: -1183493901
++  m_overrideHtmlColors: 0
++  m_faceColor:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontSize: 24
++  m_fontSizeBase: 24
++  m_fontWeight: 400
++  m_enableAutoSizing: 0
++  m_fontSizeMin: 18
++  m_fontSizeMax: 72
++  m_fontStyle: 0
++  m_HorizontalAlignment: 2
++  m_VerticalAlignment: 512
++  m_textAlignment: 65535
++  m_characterSpacing: 0
++  m_wordSpacing: 0
++  m_lineSpacing: 0
++  m_lineSpacingMax: 0
++  m_paragraphSpacing: 0
++  m_charWidthMaxAdj: 0
++  m_enableWordWrapping: 1
++  m_wordWrappingRatios: 0.4
++  m_overflowMode: 0
++  m_linkedTextComponent: {fileID: 0}
++  parentLinkedComponent: {fileID: 0}
++  m_enableKerning: 1
++  m_enableExtraPadding: 0
++  checkPaddingRequired: 0
++  m_isRichText: 1
++  m_parseCtrlCharacters: 1
++  m_isOrthographic: 1
++  m_isCullingEnabled: 0
++  m_horizontalMapping: 0
++  m_verticalMapping: 0
++  m_uvLineOffset: 0
++  m_geometrySortingOrder: 0
++  m_IsTextObjectScaleStatic: 0
++  m_VertexBufferAutoSizeReduction: 0
++  m_useMaxVisibleDescender: 1
++  m_pageToDisplay: 1
++  m_margin: {x: 0, y: 0, z: 0, w: 0}
++  m_isUsingLegacyAnimationComponent: 0
++  m_isVolumetricText: 0
++  m_hasFontAssetChanged: 0
++  m_baseMaterial: {fileID: 0}
++  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
++--- !u!1 &7784766130724765903
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 1038864593318187027}
++  - component: {fileID: 5334288610512569165}
++  - component: {fileID: 5152053152351495039}
++  - component: {fileID: 7690685387498336877}
++  m_Layer: 5
++  m_Name: "\u9000\u51FA\u6309\u94AE"
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &1038864593318187027
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7784766130724765903}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children:
++  - {fileID: 5245723623231548921}
++  m_Father: {fileID: 1872650499262150676}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: -304, y: -12}
++  m_SizeDelta: {x: 320.788, y: 133.595}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &5334288610512569165
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7784766130724765903}
++  m_CullTransparentMesh: 1
++--- !u!114 &5152053152351495039
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7784766130724765903}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
++  m_Type: 1
++  m_PreserveAspect: 0
++  m_FillCenter: 1
++  m_FillMethod: 4
++  m_FillAmount: 1
++  m_FillClockwise: 1
++  m_FillOrigin: 0
++  m_UseSpriteMesh: 0
++  m_PixelsPerUnitMultiplier: 1
++--- !u!114 &7690685387498336877
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7784766130724765903}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Navigation:
++    m_Mode: 3
++    m_WrapAround: 0
++    m_SelectOnUp: {fileID: 0}
++    m_SelectOnDown: {fileID: 0}
++    m_SelectOnLeft: {fileID: 0}
++    m_SelectOnRight: {fileID: 0}
++  m_Transition: 1
++  m_Colors:
++    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
++    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
++    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
++    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
++    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
++    m_ColorMultiplier: 1
++    m_FadeDuration: 0.1
++  m_SpriteState:
++    m_HighlightedSprite: {fileID: 0}
++    m_PressedSprite: {fileID: 0}
++    m_SelectedSprite: {fileID: 0}
++    m_DisabledSprite: {fileID: 0}
++  m_AnimationTriggers:
++    m_NormalTrigger: Normal
++    m_HighlightedTrigger: Highlighted
++    m_PressedTrigger: Pressed
++    m_SelectedTrigger: Selected
++    m_DisabledTrigger: Disabled
++  m_Interactable: 1
++  m_TargetGraphic: {fileID: 5152053152351495039}
++  m_OnClick:
++    m_PersistentCalls:
++      m_Calls:
++      - m_Target: {fileID: 1364897378461486786}
++        m_TargetAssemblyTypeName: PauseButton, Assembly-CSharp
++        m_MethodName: QuitGameButton
++        m_Mode: 1
++        m_Arguments:
++          m_ObjectArgument: {fileID: 0}
++          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
++          m_IntArgument: 0
++          m_FloatArgument: 0
++          m_StringArgument: 
++          m_BoolArgument: 0
++        m_CallState: 2
+ --- !u!1 &9178049883112456660
+ GameObject:
+   m_ObjectHideFlags: 0
+@@ -774,8 +1591,9 @@ RectTransform:
+   - {fileID: 4062997566103294753}
+   - {fileID: 4912013109359824962}
+   - {fileID: 7005036997793460264}
+-  - {fileID: 22860719044458511}
++  - {fileID: 4875372912487110824}
+   - {fileID: 4793410676667777563}
++  - {fileID: 1872650499262150676}
+   m_Father: {fileID: 1374404266077196416}
+   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+   m_AnchorMin: {x: 0, y: 0}
+diff --git a/Assets/Prefabs/UI对象/卡牌预制体.prefab b/Assets/Prefabs/UI对象/卡牌预制体.prefab
+index 0f798b9..df392d3 100644
+--- a/Assets/Prefabs/UI对象/卡牌预制体.prefab
++++ b/Assets/Prefabs/UI对象/卡牌预制体.prefab
+@@ -10,8 +10,9 @@ GameObject:
+   m_Component:
+   - component: {fileID: 6075377971640466191}
+   - component: {fileID: 5087820937323056563}
+-  - component: {fileID: 8488129783916096548}
+-  - component: {fileID: 1993842114130352133}
++  - component: {fileID: -6197727458165178202}
++  - component: {fileID: 7720257466800211476}
++  - component: {fileID: -376314327586709593}
+   m_Layer: 5
+   m_Name: "\u5361\u724C\u9884\u5236\u4F53"
+   m_TagString: Untagged
+@@ -30,13 +31,16 @@ RectTransform:
+   m_LocalPosition: {x: 0, y: 0, z: 0}
+   m_LocalScale: {x: 1, y: 1, z: 1}
+   m_ConstrainProportionsScale: 0
+-  m_Children: []
++  m_Children:
++  - {fileID: 7822256019397376140}
++  - {fileID: 7800477295047409485}
++  - {fileID: 6728811279232402048}
+   m_Father: {fileID: 0}
+   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+   m_AnchorMin: {x: 0.5, y: 0.5}
+   m_AnchorMax: {x: 0.5, y: 0.5}
+-  m_AnchoredPosition: {x: -910, y: -489.77808}
+-  m_SizeDelta: {x: 100, y: 100}
++  m_AnchoredPosition: {x: 1.5610962, y: -0.91690063}
++  m_SizeDelta: {x: 120, y: 120}
+   m_Pivot: {x: 0.5, y: 0.5}
+ --- !u!222 &5087820937323056563
+ CanvasRenderer:
+@@ -46,7 +50,7 @@ CanvasRenderer:
+   m_PrefabAsset: {fileID: 0}
+   m_GameObject: {fileID: 782492957339143259}
+   m_CullTransparentMesh: 1
+---- !u!114 &8488129783916096548
++--- !u!114 &-6197727458165178202
+ MonoBehaviour:
+   m_ObjectHideFlags: 0
+   m_CorrespondingSourceObject: {fileID: 0}
+@@ -55,11 +59,544 @@ MonoBehaviour:
+   m_GameObject: {fileID: 782492957339143259}
+   m_Enabled: 1
+   m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 3fdc8e1ebd5c5b849afa99db6f0ee0d2, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  cardData:
++    cardType: 0
++    cardSprite: {fileID: 0}
++    cardDescription: 
++    cardName: 
++  useCount: 0
++  useCountText: {fileID: 5878763484925732163}
++  useImage: {fileID: 551585858812055876}
++  cardDetail: {fileID: 2843263313504113799}
++  cardDetailText: {fileID: 2262119549502435139}
++  cardNameText: {fileID: 3211768617977700491}
++  isDragging: 0
++  originalPosition: {x: 0, y: 0, z: 0}
++  offset: {x: 0, y: 0, z: 0}
++  useCardThreshold: 250
++--- !u!223 &7720257466800211476
++Canvas:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 782492957339143259}
++  m_Enabled: 1
++  serializedVersion: 3
++  m_RenderMode: 2
++  m_Camera: {fileID: 0}
++  m_PlaneDistance: 100
++  m_PixelPerfect: 0
++  m_ReceivesEvents: 1
++  m_OverrideSorting: 0
++  m_OverridePixelPerfect: 0
++  m_SortingBucketNormalizedSize: 0
++  m_VertexColorAlwaysGammaSpace: 0
++  m_AdditionalShaderChannelsFlag: 25
++  m_UpdateRectTransformForStandalone: 0
++  m_SortingLayerID: 0
++  m_SortingOrder: 0
++  m_TargetDisplay: 0
++--- !u!114 &-376314327586709593
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 782492957339143259}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_IgnoreReversedGraphics: 1
++  m_BlockingObjects: 0
++  m_BlockingMask:
++    serializedVersion: 2
++    m_Bits: 4294967295
++--- !u!1 &1841387156300653085
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 4026629023993276328}
++  - component: {fileID: 2251925516336938796}
++  - component: {fileID: 5878763484925732163}
++  m_Layer: 5
++  m_Name: Text (TMP)
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &4026629023993276328
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1841387156300653085}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 7822256019397376140}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: -0.000052452087, y: 0.000024318695}
++  m_SizeDelta: {x: 16, y: 16}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &2251925516336938796
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1841387156300653085}
++  m_CullTransparentMesh: 1
++--- !u!114 &5878763484925732163
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1841387156300653085}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_text: 1
++  m_isRightToLeft: 0
++  m_fontAsset: {fileID: 11400000, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_sharedMaterial: {fileID: 3012593490416124421, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_fontSharedMaterials: []
++  m_fontMaterial: {fileID: 0}
++  m_fontMaterials: []
++  m_fontColor32:
++    serializedVersion: 2
++    rgba: 4278190080
++  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
++  m_enableVertexGradient: 0
++  m_colorMode: 3
++  m_fontColorGradient:
++    topLeft: {r: 1, g: 1, b: 1, a: 1}
++    topRight: {r: 1, g: 1, b: 1, a: 1}
++    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
++    bottomRight: {r: 1, g: 1, b: 1, a: 1}
++  m_fontColorGradientPreset: {fileID: 0}
++  m_spriteAsset: {fileID: 0}
++  m_tintAllSprites: 0
++  m_StyleSheet: {fileID: 0}
++  m_TextStyleHashCode: -1183493901
++  m_overrideHtmlColors: 0
++  m_faceColor:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontSize: 12
++  m_fontSizeBase: 6.97
++  m_fontWeight: 400
++  m_enableAutoSizing: 1
++  m_fontSizeMin: 12
++  m_fontSizeMax: 72
++  m_fontStyle: 0
++  m_HorizontalAlignment: 2
++  m_VerticalAlignment: 512
++  m_textAlignment: 65535
++  m_characterSpacing: 0
++  m_wordSpacing: 0
++  m_lineSpacing: 0
++  m_lineSpacingMax: 0
++  m_paragraphSpacing: 0
++  m_charWidthMaxAdj: 0
++  m_enableWordWrapping: 1
++  m_wordWrappingRatios: 0.4
++  m_overflowMode: 0
++  m_linkedTextComponent: {fileID: 0}
++  parentLinkedComponent: {fileID: 0}
++  m_enableKerning: 1
++  m_enableExtraPadding: 0
++  checkPaddingRequired: 0
++  m_isRichText: 1
++  m_parseCtrlCharacters: 1
++  m_isOrthographic: 1
++  m_isCullingEnabled: 0
++  m_horizontalMapping: 0
++  m_verticalMapping: 0
++  m_uvLineOffset: 0
++  m_geometrySortingOrder: 0
++  m_IsTextObjectScaleStatic: 0
++  m_VertexBufferAutoSizeReduction: 0
++  m_useMaxVisibleDescender: 1
++  m_pageToDisplay: 1
++  m_margin: {x: 0, y: -0.11883545, z: 0, w: -0.11880493}
++  m_isUsingLegacyAnimationComponent: 0
++  m_isVolumetricText: 0
++  m_hasFontAssetChanged: 0
++  m_baseMaterial: {fileID: 0}
++  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
++--- !u!1 &4702381503340960609
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 7822256019397376140}
++  - component: {fileID: 179351654520104476}
++  - component: {fileID: 3782120227157202773}
++  m_Layer: 5
++  m_Name: Image
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &7822256019397376140
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4702381503340960609}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children:
++  - {fileID: 4026629023993276328}
++  m_Father: {fileID: 6075377971640466191}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.80833334, y: 0.80833334}
++  m_AnchorMax: {x: 1, y: 1}
++  m_AnchoredPosition: {x: -0.099998474, y: 0}
++  m_SizeDelta: {x: -0.3618002, y: -0.5078001}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &179351654520104476
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4702381503340960609}
++  m_CullTransparentMesh: 1
++--- !u!114 &3782120227157202773
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4702381503340960609}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
++  m_Type: 0
++  m_PreserveAspect: 0
++  m_FillCenter: 1
++  m_FillMethod: 4
++  m_FillAmount: 1
++  m_FillClockwise: 1
++  m_FillOrigin: 0
++  m_UseSpriteMesh: 0
++  m_PixelsPerUnitMultiplier: 1
++--- !u!1 &4924940065898776551
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 7672152701161210991}
++  - component: {fileID: 2028931744517233073}
++  - component: {fileID: 3211768617977700491}
++  m_Layer: 5
++  m_Name: "\u540D\u79F0"
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &7672152701161210991
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4924940065898776551}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 6728811279232402048}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: 1.4288, y: 33.80001}
++  m_SizeDelta: {x: 97.143, y: 32.4}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &2028931744517233073
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4924940065898776551}
++  m_CullTransparentMesh: 1
++--- !u!114 &3211768617977700491
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 4924940065898776551}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_text: New Text
++  m_isRightToLeft: 0
++  m_fontAsset: {fileID: 11400000, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_sharedMaterial: {fileID: 3012593490416124421, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_fontSharedMaterials: []
++  m_fontMaterial: {fileID: 0}
++  m_fontMaterials: []
++  m_fontColor32:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
++  m_enableVertexGradient: 0
++  m_colorMode: 3
++  m_fontColorGradient:
++    topLeft: {r: 1, g: 1, b: 1, a: 1}
++    topRight: {r: 1, g: 1, b: 1, a: 1}
++    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
++    bottomRight: {r: 1, g: 1, b: 1, a: 1}
++  m_fontColorGradientPreset: {fileID: 0}
++  m_spriteAsset: {fileID: 0}
++  m_tintAllSprites: 0
++  m_StyleSheet: {fileID: 0}
++  m_TextStyleHashCode: -1183493901
++  m_overrideHtmlColors: 0
++  m_faceColor:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontSize: 21.5
++  m_fontSizeBase: 36
++  m_fontWeight: 400
++  m_enableAutoSizing: 1
++  m_fontSizeMin: 18
++  m_fontSizeMax: 72
++  m_fontStyle: 0
++  m_HorizontalAlignment: 1
++  m_VerticalAlignment: 256
++  m_textAlignment: 65535
++  m_characterSpacing: 0
++  m_wordSpacing: 0
++  m_lineSpacing: 0
++  m_lineSpacingMax: 0
++  m_paragraphSpacing: 0
++  m_charWidthMaxAdj: 0
++  m_enableWordWrapping: 1
++  m_wordWrappingRatios: 0.4
++  m_overflowMode: 0
++  m_linkedTextComponent: {fileID: 0}
++  parentLinkedComponent: {fileID: 0}
++  m_enableKerning: 1
++  m_enableExtraPadding: 0
++  checkPaddingRequired: 0
++  m_isRichText: 1
++  m_parseCtrlCharacters: 1
++  m_isOrthographic: 1
++  m_isCullingEnabled: 0
++  m_horizontalMapping: 0
++  m_verticalMapping: 0
++  m_uvLineOffset: 0
++  m_geometrySortingOrder: 0
++  m_IsTextObjectScaleStatic: 0
++  m_VertexBufferAutoSizeReduction: 0
++  m_useMaxVisibleDescender: 1
++  m_pageToDisplay: 1
++  m_margin: {x: -0.48965454, y: 0, z: 0, w: 0}
++  m_isUsingLegacyAnimationComponent: 0
++  m_isVolumetricText: 0
++  m_hasFontAssetChanged: 0
++  m_baseMaterial: {fileID: 0}
++  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
++--- !u!1 &7395657964078387783
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 7800477295047409485}
++  - component: {fileID: 1918580238911795190}
++  - component: {fileID: 551585858812055876}
++  m_Layer: 5
++  m_Name: Image (1)
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &7800477295047409485
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7395657964078387783}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 6075377971640466191}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0, y: 0}
++  m_AnchorMax: {x: 0.85, y: 0.82500005}
++  m_AnchoredPosition: {x: 0.099998474, y: 1.0499954}
++  m_SizeDelta: {x: -2, y: 2.0999985}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &1918580238911795190
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7395657964078387783}
++  m_CullTransparentMesh: 1
++--- !u!114 &551585858812055876
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7395657964078387783}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 0.49056602, g: 0.49056602, b: 0.49056602, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_Sprite: {fileID: 0}
++  m_Type: 0
++  m_PreserveAspect: 0
++  m_FillCenter: 1
++  m_FillMethod: 4
++  m_FillAmount: 1
++  m_FillClockwise: 1
++  m_FillOrigin: 0
++  m_UseSpriteMesh: 0
++  m_PixelsPerUnitMultiplier: 1
++--- !u!1 &7591894716596093717
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 6728811279232402048}
++  - component: {fileID: 2055330350641729598}
++  - component: {fileID: 2843263313504113799}
++  m_Layer: 5
++  m_Name: "\u7EC6\u8282\u80CC\u666F"
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 0
++--- !u!224 &6728811279232402048
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7591894716596093717}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children:
++  - {fileID: 7672152701161210991}
++  - {fileID: 8380838019440644827}
++  m_Father: {fileID: 6075377971640466191}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: 109.2, y: 57.8}
++  m_SizeDelta: {x: 100, y: 100}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &2055330350641729598
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7591894716596093717}
++  m_CullTransparentMesh: 1
++--- !u!114 &2843263313504113799
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7591894716596093717}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
+   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: 
+   m_Material: {fileID: 0}
+-  m_Color: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
++  m_Color: {r: 0, g: 0, b: 0, a: 1}
+   m_RaycastTarget: 1
+   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+   m_Maskable: 1
+@@ -76,20 +613,137 @@ MonoBehaviour:
+   m_FillOrigin: 0
+   m_UseSpriteMesh: 0
+   m_PixelsPerUnitMultiplier: 1
+---- !u!114 &1993842114130352133
++--- !u!1 &7863830404803171653
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 8380838019440644827}
++  - component: {fileID: 1016404036881341741}
++  - component: {fileID: 2262119549502435139}
++  m_Layer: 5
++  m_Name: "\u7EC6\u8282"
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &8380838019440644827
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7863830404803171653}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 6728811279232402048}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: 0.00011063, y: -17.900005}
++  m_SizeDelta: {x: 100, y: 64.2}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!222 &1016404036881341741
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 7863830404803171653}
++  m_CullTransparentMesh: 1
++--- !u!114 &2262119549502435139
+ MonoBehaviour:
+   m_ObjectHideFlags: 0
+   m_CorrespondingSourceObject: {fileID: 0}
+   m_PrefabInstance: {fileID: 0}
+   m_PrefabAsset: {fileID: 0}
+-  m_GameObject: {fileID: 782492957339143259}
++  m_GameObject: {fileID: 7863830404803171653}
+   m_Enabled: 1
+   m_EditorHideFlags: 0
+-  m_Script: {fileID: 11500000, guid: 3fdc8e1ebd5c5b849afa99db6f0ee0d2, type: 3}
++  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+   m_Name: 
+   m_EditorClassIdentifier: 
+-  cardData:
+-    cardType: 0
+-    cardSprite: {fileID: 0}
+-    cardDescription: 
+-    cardName: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_text: New Text
++  m_isRightToLeft: 0
++  m_fontAsset: {fileID: 11400000, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_sharedMaterial: {fileID: 3012593490416124421, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_fontSharedMaterials: []
++  m_fontMaterial: {fileID: 0}
++  m_fontMaterials: []
++  m_fontColor32:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
++  m_enableVertexGradient: 0
++  m_colorMode: 3
++  m_fontColorGradient:
++    topLeft: {r: 1, g: 1, b: 1, a: 1}
++    topRight: {r: 1, g: 1, b: 1, a: 1}
++    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
++    bottomRight: {r: 1, g: 1, b: 1, a: 1}
++  m_fontColorGradientPreset: {fileID: 0}
++  m_spriteAsset: {fileID: 0}
++  m_tintAllSprites: 0
++  m_StyleSheet: {fileID: 0}
++  m_TextStyleHashCode: -1183493901
++  m_overrideHtmlColors: 0
++  m_faceColor:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontSize: 15
++  m_fontSizeBase: 15
++  m_fontWeight: 400
++  m_enableAutoSizing: 0
++  m_fontSizeMin: 18
++  m_fontSizeMax: 72
++  m_fontStyle: 0
++  m_HorizontalAlignment: 1
++  m_VerticalAlignment: 256
++  m_textAlignment: 65535
++  m_characterSpacing: 0
++  m_wordSpacing: 0
++  m_lineSpacing: 0
++  m_lineSpacingMax: 0
++  m_paragraphSpacing: 0
++  m_charWidthMaxAdj: 0
++  m_enableWordWrapping: 1
++  m_wordWrappingRatios: 0.4
++  m_overflowMode: 0
++  m_linkedTextComponent: {fileID: 0}
++  parentLinkedComponent: {fileID: 0}
++  m_enableKerning: 1
++  m_enableExtraPadding: 0
++  checkPaddingRequired: 0
++  m_isRichText: 1
++  m_parseCtrlCharacters: 1
++  m_isOrthographic: 1
++  m_isCullingEnabled: 0
++  m_horizontalMapping: 0
++  m_verticalMapping: 0
++  m_uvLineOffset: 0
++  m_geometrySortingOrder: 0
++  m_IsTextObjectScaleStatic: 0
++  m_VertexBufferAutoSizeReduction: 0
++  m_useMaxVisibleDescender: 1
++  m_pageToDisplay: 1
++  m_margin: {x: 0, y: 0, z: 0, w: 0}
++  m_isUsingLegacyAnimationComponent: 0
++  m_isVolumetricText: 0
++  m_hasFontAssetChanged: 0
++  m_baseMaterial: {fileID: 0}
++  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+diff --git a/Assets/Prefabs/场景对象/water.prefab b/Assets/Prefabs/场景对象/water.prefab
+index 6cfcaf1..e5fdf16 100644
+--- a/Assets/Prefabs/场景对象/water.prefab
++++ b/Assets/Prefabs/场景对象/water.prefab
+@@ -26,7 +26,7 @@ Transform:
+   m_GameObject: {fileID: 3041432077411647106}
+   serializedVersion: 2
+   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+-  m_LocalPosition: {x: -5.7375603, y: -2.8552902, z: 0}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
+   m_LocalScale: {x: 1, y: 1, z: 1}
+   m_ConstrainProportionsScale: 0
+   m_Children: []
+diff --git a/Assets/Scenes/Chapter1Floor1.unity b/Assets/Scenes/Chapter1Floor1.unity
+index c4e534a..ea849a9 100644
+--- a/Assets/Scenes/Chapter1Floor1.unity
++++ b/Assets/Scenes/Chapter1Floor1.unity
+@@ -1355,6 +1355,199 @@ PrefabInstance:
+     m_AddedGameObjects: []
+     m_AddedComponents: []
+   m_SourcePrefab: {fileID: 100100000, guid: d9cc61d94fb465448ad7709f7a726b98, type: 3}
++--- !u!1001 &1153928160
++PrefabInstance:
++  m_ObjectHideFlags: 0
++  serializedVersion: 2
++  m_Modification:
++    serializedVersion: 3
++    m_TransformParent: {fileID: 0}
++    m_Modifications:
++    - target: {fileID: 2554325266209547040, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_Name
++      value: LevelManager
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: cardData
++      value: 
++      objectReference: {fileID: 11400000, guid: d0332f8446262a24ea34da630d967959, type: 2}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.size
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].mapSize.x
++      value: 10
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].mapSize.y
++      value: 10
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].mapSize.x
++      value: 10
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].mapSize.y
++      value: 10
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].endStepCount
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].endStepCount
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.size
++      value: 3
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.size
++      value: 3
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.size
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.size
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[0].round
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[1].round
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[2].round
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[0].round
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[1].round
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[2].round
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[0].cardType
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[0].useCount
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[1].cardType
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[1].useCount
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[2].cardType
++      value: 3
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[2].useCount
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[0].cardType
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[0].useCount
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[1].cardType
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[1].useCount
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[2].cardType
++      value: 3
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].cardData.Array.data[2].useCount
++      value: 2
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].position.x
++      value: 3
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].position.y
++      value: 3
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].mapCellContent
++      value: 6
++      objectReference: {fileID: 0}
++    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[0].mapCellContent
++      value: 6
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalPosition.x
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalPosition.y
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalPosition.z
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalRotation.w
++      value: 1
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalRotation.x
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalRotation.y
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalRotation.z
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalEulerAnglesHint.x
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalEulerAnglesHint.y
++      value: 0
++      objectReference: {fileID: 0}
++    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
++      propertyPath: m_LocalEulerAnglesHint.z
++      value: 0
++      objectReference: {fileID: 0}
++    m_RemovedComponents: []
++    m_RemovedGameObjects: []
++    m_AddedGameObjects: []
++    m_AddedComponents: []
++  m_SourcePrefab: {fileID: 100100000, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+ --- !u!1001 &1790773130
+ PrefabInstance:
+   m_ObjectHideFlags: 0
+@@ -1744,343 +1937,6 @@ PrefabInstance:
+     m_AddedGameObjects: []
+     m_AddedComponents: []
+   m_SourcePrefab: {fileID: 100100000, guid: acd25bf022bd6ba40825899ea165ba35, type: 3}
+---- !u!1001 &3292231388544784522
+-PrefabInstance:
+-  m_ObjectHideFlags: 0
+-  serializedVersion: 2
+-  m_Modification:
+-    serializedVersion: 3
+-    m_TransformParent: {fileID: 0}
+-    m_Modifications:
+-    - target: {fileID: 2554325266209547040, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_Name
+-      value: LevelManager
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: cardData
+-      value: 
+-      objectReference: {fileID: 11400000, guid: d0332f8446262a24ea34da630d967959, type: 2}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.size
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: levelManagements.Array.size
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.size
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.size
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: levelManagements.Array.data[0].unitPositions.Array.size
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].mapSize.x
+-      value: 10
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].mapSize.y
+-      value: 10
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].mapSize.x
+-      value: 10
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].mapSize.y
+-      value: 10
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].mapSize.x
+-      value: 10
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].mapSize.y
+-      value: 10
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].isCollapse
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].endStepCount
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].endStepCount
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: levelManagements.Array.data[0].unitPositions.Array.data[0].position.x
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: levelManagements.Array.data[0].unitPositions.Array.data[0].position.y
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.size
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: levelManagements.Array.data[0].unitPositions.Array.data[0].mapCellContent
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.size
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.size
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.size
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.size
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[0].round
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].id
+-      value: 
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[1].id
+-      value: 
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[2].id
+-      value: 111
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[3].id
+-      value: 111
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[4].id
+-      value: 111
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[0].id
+-      value: 
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[1].id
+-      value: 
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[2].id
+-      value: 111
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[0].cardType
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].cardData.Array.data[0].useCount
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].position.x
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].position.y
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[1].position.x
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[1].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[2].position.x
+-      value: 4
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[2].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[3].position.x
+-      value: 4
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[3].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[4].position.x
+-      value: 5
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[4].position.y
+-      value: 4
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[0].position.x
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[0].position.y
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[1].position.x
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[1].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[2].position.x
+-      value: 4
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[2].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.data[0].position.x
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.data[0].position.y
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.data[1].position.x
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.data[1].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.data[0].position.x
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.data[0].position.y
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.data[1].position.x
+-      value: 11
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.data[1].position.y
+-      value: 11
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[0].mapCellContent
+-      value: 6
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[1].mapCellContent
+-      value: 6
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[2].mapCellContent
+-      value: 9
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[3].mapCellContent
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[4].mapCellContent
+-      value: 5
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[0].mapCellContent
+-      value: 6
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[1].mapCellContent
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[1].unitPositions.Array.data[2].mapCellContent
+-      value: 9
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.data[0].mapCellContent
+-      value: 6
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[2].unitPositions.Array.data[1].mapCellContent
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.data[0].mapCellContent
+-      value: 3
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[0].unitPositions.Array.data[1].mapCellContent
+-      value: 6
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalPosition.x
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalPosition.y
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalPosition.z
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalRotation.w
+-      value: 1
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalRotation.x
+-      value: -0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalRotation.y
+-      value: -0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalRotation.z
+-      value: -0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalEulerAnglesHint.x
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalEulerAnglesHint.y
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+-      propertyPath: m_LocalEulerAnglesHint.z
+-      value: 0
+-      objectReference: {fileID: 0}
+-    m_RemovedComponents: []
+-    m_RemovedGameObjects: []
+-    m_AddedGameObjects: []
+-    m_AddedComponents: []
+-  m_SourcePrefab: {fileID: 100100000, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+ --- !u!1001 &3822730899583430085
+ PrefabInstance:
+   m_ObjectHideFlags: 0
+@@ -2328,7 +2184,6 @@ SceneRoots:
+   - {fileID: 6619259617077485517}
+   - {fileID: 2903924542207940948}
+   - {fileID: 3822730899583430085}
+-  - {fileID: 3292231388544784522}
+   - {fileID: 3864868778602858377}
+   - {fileID: 2125380864}
+   - {fileID: 378088671}
+@@ -2337,3 +2192,4 @@ SceneRoots:
+   - {fileID: 2370776867066614229}
+   - {fileID: 1790773130}
+   - {fileID: 1941574844473559532}
++  - {fileID: 1153928160}
+diff --git a/Assets/Scenes/END.unity b/Assets/Scenes/END.unity
+new file mode 100644
+index 0000000..22843d8
+--- /dev/null
++++ b/Assets/Scenes/END.unity
+@@ -0,0 +1,128 @@
++%YAML 1.1
++%TAG !u! tag:unity3d.com,2011:
++--- !u!29 &1
++OcclusionCullingSettings:
++  m_ObjectHideFlags: 0
++  serializedVersion: 2
++  m_OcclusionBakeSettings:
++    smallestOccluder: 5
++    smallestHole: 0.25
++    backfaceThreshold: 100
++  m_SceneGUID: 00000000000000000000000000000000
++  m_OcclusionCullingData: {fileID: 0}
++--- !u!104 &2
++RenderSettings:
++  m_ObjectHideFlags: 0
++  serializedVersion: 9
++  m_Fog: 0
++  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
++  m_FogMode: 3
++  m_FogDensity: 0.01
++  m_LinearFogStart: 0
++  m_LinearFogEnd: 300
++  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
++  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
++  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
++  m_AmbientIntensity: 1
++  m_AmbientMode: 3
++  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
++  m_SkyboxMaterial: {fileID: 0}
++  m_HaloStrength: 0.5
++  m_FlareStrength: 1
++  m_FlareFadeSpeed: 3
++  m_HaloTexture: {fileID: 0}
++  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
++  m_DefaultReflectionMode: 0
++  m_DefaultReflectionResolution: 128
++  m_ReflectionBounces: 1
++  m_ReflectionIntensity: 1
++  m_CustomReflection: {fileID: 0}
++  m_Sun: {fileID: 0}
++  m_UseRadianceAmbientProbe: 0
++--- !u!157 &3
++LightmapSettings:
++  m_ObjectHideFlags: 0
++  serializedVersion: 12
++  m_GIWorkflowMode: 1
++  m_GISettings:
++    serializedVersion: 2
++    m_BounceScale: 1
++    m_IndirectOutputScale: 1
++    m_AlbedoBoost: 1
++    m_EnvironmentLightingMode: 0
++    m_EnableBakedLightmaps: 0
++    m_EnableRealtimeLightmaps: 0
++  m_LightmapEditorSettings:
++    serializedVersion: 12
++    m_Resolution: 2
++    m_BakeResolution: 40
++    m_AtlasSize: 1024
++    m_AO: 0
++    m_AOMaxDistance: 1
++    m_CompAOExponent: 1
++    m_CompAOExponentDirect: 0
++    m_ExtractAmbientOcclusion: 0
++    m_Padding: 2
++    m_LightmapParameters: {fileID: 0}
++    m_LightmapsBakeMode: 1
++    m_TextureCompression: 1
++    m_FinalGather: 0
++    m_FinalGatherFiltering: 1
++    m_FinalGatherRayCount: 256
++    m_ReflectionCompression: 2
++    m_MixedBakeMode: 2
++    m_BakeBackend: 1
++    m_PVRSampling: 1
++    m_PVRDirectSampleCount: 32
++    m_PVRSampleCount: 512
++    m_PVRBounces: 2
++    m_PVREnvironmentSampleCount: 256
++    m_PVREnvironmentReferencePointCount: 2048
++    m_PVRFilteringMode: 1
++    m_PVRDenoiserTypeDirect: 1
++    m_PVRDenoiserTypeIndirect: 1
++    m_PVRDenoiserTypeAO: 1
++    m_PVRFilterTypeDirect: 0
++    m_PVRFilterTypeIndirect: 0
++    m_PVRFilterTypeAO: 0
++    m_PVREnvironmentMIS: 1
++    m_PVRCulling: 1
++    m_PVRFilteringGaussRadiusDirect: 1
++    m_PVRFilteringGaussRadiusIndirect: 5
++    m_PVRFilteringGaussRadiusAO: 2
++    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
++    m_PVRFilteringAtrousPositionSigmaIndirect: 2
++    m_PVRFilteringAtrousPositionSigmaAO: 1
++    m_ExportTrainingData: 0
++    m_TrainingDataDestination: TrainingData
++    m_LightProbeSampleCountMultiplier: 4
++  m_LightingDataAsset: {fileID: 0}
++  m_LightingSettings: {fileID: 0}
++--- !u!196 &4
++NavMeshSettings:
++  serializedVersion: 2
++  m_ObjectHideFlags: 0
++  m_BuildSettings:
++    serializedVersion: 3
++    agentTypeID: 0
++    agentRadius: 0.5
++    agentHeight: 2
++    agentSlope: 45
++    agentClimb: 0.4
++    ledgeDropHeight: 0
++    maxJumpAcrossDistance: 0
++    minRegionArea: 2
++    manualCellSize: 0
++    cellSize: 0.16666667
++    manualTileSize: 0
++    tileSize: 256
++    buildHeightMesh: 0
++    maxJobWorkers: 0
++    preserveTilesOutsideBounds: 0
++    debug:
++      m_Flags: 0
++  m_NavMeshData: {fileID: 0}
++--- !u!1660057539 &9223372036854775807
++SceneRoots:
++  m_ObjectHideFlags: 0
++  m_Roots: []
+diff --git a/Assets/Scenes/END.unity.meta b/Assets/Scenes/END.unity.meta
+new file mode 100644
+index 0000000..2479136
+--- /dev/null
++++ b/Assets/Scenes/END.unity.meta
+@@ -0,0 +1,7 @@
++fileFormatVersion: 2
++guid: 3b6f9a8d143addd4ca1143d212213314
++DefaultImporter:
++  externalObjects: {}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/Assets/Scenes/UI.unity b/Assets/Scenes/UI.unity
+index 062fb53..e5759bd 100644
+--- a/Assets/Scenes/UI.unity
++++ b/Assets/Scenes/UI.unity
+@@ -130,18 +130,6 @@ PrefabInstance:
+     serializedVersion: 3
+     m_TransformParent: {fileID: 0}
+     m_Modifications:
+-    - target: {fileID: 22860719044458511, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: m_SizeDelta.y
+-      value: 17.05
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 22860719044458511, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: m_AnchoredPosition.x
+-      value: 0
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 22860719044458511, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: m_AnchoredPosition.y
+-      value: -530.91
+-      objectReference: {fileID: 0}
+     - target: {fileID: 1374404266077196416, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+       propertyPath: m_LocalPosition.x
+       value: 0
+@@ -182,31 +170,178 @@ PrefabInstance:
+       propertyPath: m_LocalEulerAnglesHint.z
+       value: 0
+       objectReference: {fileID: 0}
+-    - target: {fileID: 2345146452061773102, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: hidePosition.y
+-      value: -530
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 2345146452061773102, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: expandPosition.y
+-      value: -240
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 2345146452061773102, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: sprites.Array.size
+-      value: 2
+-      objectReference: {fileID: 0}
+-    - target: {fileID: 3430288058981736230, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+-      propertyPath: card
+-      value: 
+-      objectReference: {fileID: 782492957339143259, guid: 2c0fcc93b8a26f14db2d6c1f5695830b, type: 3}
+     - target: {fileID: 5431813593613293008, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
+       propertyPath: m_Name
+       value: UIManager
+       objectReference: {fileID: 0}
+     m_RemovedComponents: []
+     m_RemovedGameObjects: []
+-    m_AddedGameObjects: []
+-    m_AddedComponents: []
++    m_AddedGameObjects:
++    - targetCorrespondingSourceObject: {fileID: 4912013109359824962, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
++      insertIndex: -1
++      addedObject: {fileID: 1886790769}
++    m_AddedComponents:
++    - targetCorrespondingSourceObject: {fileID: 2733109356988626264, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
++      insertIndex: -1
++      addedObject: {fileID: 1548814489}
+   m_SourcePrefab: {fileID: 100100000, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
++--- !u!1 &1548814485 stripped
++GameObject:
++  m_CorrespondingSourceObject: {fileID: 2733109356988626264, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
++  m_PrefabInstance: {fileID: 422139500}
++  m_PrefabAsset: {fileID: 0}
++--- !u!224 &1548814486 stripped
++RectTransform:
++  m_CorrespondingSourceObject: {fileID: 4912013109359824962, guid: 21d5a47093b6e564c8cac4c4fbcebc65, type: 3}
++  m_PrefabInstance: {fileID: 422139500}
++  m_PrefabAsset: {fileID: 0}
++--- !u!114 &1548814489
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1548814485}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: 46d43a0207eada14aa210542a69d7d12, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  chapterReminderText: {fileID: 1886790770}
++--- !u!1 &1886790768
++GameObject:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  serializedVersion: 6
++  m_Component:
++  - component: {fileID: 1886790769}
++  - component: {fileID: 1886790771}
++  - component: {fileID: 1886790770}
++  m_Layer: 5
++  m_Name: Text (TMP)
++  m_TagString: Untagged
++  m_Icon: {fileID: 0}
++  m_NavMeshLayer: 0
++  m_StaticEditorFlags: 0
++  m_IsActive: 1
++--- !u!224 &1886790769
++RectTransform:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1886790768}
++  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
++  m_LocalPosition: {x: 0, y: 0, z: 0}
++  m_LocalScale: {x: 1, y: 1, z: 1}
++  m_ConstrainProportionsScale: 0
++  m_Children: []
++  m_Father: {fileID: 1548814486}
++  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
++  m_AnchorMin: {x: 0.5, y: 0.5}
++  m_AnchorMax: {x: 0.5, y: 0.5}
++  m_AnchoredPosition: {x: 0.00090027, y: 0}
++  m_SizeDelta: {x: 298.37, y: 50}
++  m_Pivot: {x: 0.5, y: 0.5}
++--- !u!114 &1886790770
++MonoBehaviour:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1886790768}
++  m_Enabled: 1
++  m_EditorHideFlags: 0
++  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
++  m_Name: 
++  m_EditorClassIdentifier: 
++  m_Material: {fileID: 0}
++  m_Color: {r: 1, g: 1, b: 1, a: 1}
++  m_RaycastTarget: 1
++  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
++  m_Maskable: 1
++  m_OnCullStateChanged:
++    m_PersistentCalls:
++      m_Calls: []
++  m_text: New Text
++  m_isRightToLeft: 0
++  m_fontAsset: {fileID: 11400000, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_sharedMaterial: {fileID: 3012593490416124421, guid: 94982d0fa16099d4bad849d14edda45f, type: 2}
++  m_fontSharedMaterials: []
++  m_fontMaterial: {fileID: 0}
++  m_fontMaterials: []
++  m_fontColor32:
++    serializedVersion: 2
++    rgba: 4278190080
++  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
++  m_enableVertexGradient: 0
++  m_colorMode: 3
++  m_fontColorGradient:
++    topLeft: {r: 1, g: 1, b: 1, a: 1}
++    topRight: {r: 1, g: 1, b: 1, a: 1}
++    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
++    bottomRight: {r: 1, g: 1, b: 1, a: 1}
++  m_fontColorGradientPreset: {fileID: 0}
++  m_spriteAsset: {fileID: 0}
++  m_tintAllSprites: 0
++  m_StyleSheet: {fileID: 0}
++  m_TextStyleHashCode: -1183493901
++  m_overrideHtmlColors: 0
++  m_faceColor:
++    serializedVersion: 2
++    rgba: 4294967295
++  m_fontSize: 34.75
++  m_fontSizeBase: 36
++  m_fontWeight: 400
++  m_enableAutoSizing: 1
++  m_fontSizeMin: 18
++  m_fontSizeMax: 72
++  m_fontStyle: 2
++  m_HorizontalAlignment: 2
++  m_VerticalAlignment: 256
++  m_textAlignment: 65535
++  m_characterSpacing: 0
++  m_wordSpacing: 0
++  m_lineSpacing: 0
++  m_lineSpacingMax: 0
++  m_paragraphSpacing: 0
++  m_charWidthMaxAdj: 0
++  m_enableWordWrapping: 1
++  m_wordWrappingRatios: 0.4
++  m_overflowMode: 0
++  m_linkedTextComponent: {fileID: 0}
++  parentLinkedComponent: {fileID: 0}
++  m_enableKerning: 1
++  m_enableExtraPadding: 0
++  checkPaddingRequired: 0
++  m_isRichText: 1
++  m_parseCtrlCharacters: 1
++  m_isOrthographic: 1
++  m_isCullingEnabled: 0
++  m_horizontalMapping: 0
++  m_verticalMapping: 0
++  m_uvLineOffset: 0
++  m_geometrySortingOrder: 0
++  m_IsTextObjectScaleStatic: 0
++  m_VertexBufferAutoSizeReduction: 0
++  m_useMaxVisibleDescender: 1
++  m_pageToDisplay: 1
++  m_margin: {x: 0, y: 0, z: 0, w: 0}
++  m_isUsingLegacyAnimationComponent: 0
++  m_isVolumetricText: 0
++  m_hasFontAssetChanged: 0
++  m_baseMaterial: {fileID: 0}
++  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
++--- !u!222 &1886790771
++CanvasRenderer:
++  m_ObjectHideFlags: 0
++  m_CorrespondingSourceObject: {fileID: 0}
++  m_PrefabInstance: {fileID: 0}
++  m_PrefabAsset: {fileID: 0}
++  m_GameObject: {fileID: 1886790768}
++  m_CullTransparentMesh: 1
+ --- !u!1660057539 &9223372036854775807
+ SceneRoots:
+   m_ObjectHideFlags: 0
+diff --git a/Assets/Scripts/EventHandler.cs b/Assets/Scripts/EventHandler.cs
+index 2d0c91c..460dea3 100644
+--- a/Assets/Scripts/EventHandler.cs
++++ b/Assets/Scripts/EventHandler.cs
+@@ -14,6 +14,7 @@ public static class EventHandler
+     public static Action updateCard;//更新卡牌数据事件
+     public static Action playerMove;//改变玩家位置事件
+     public static Action playerStand;//玩家退出特殊状态事件
++    public static Action<DialogueSO> showDialogue;//显示对话框事件
+ 
+ 
+     public static void CallMouseLeftClick(Vector2 position)//调用鼠标点击左键事件
+@@ -56,4 +57,8 @@ public static class EventHandler
+     {
+         playerStand?.Invoke();
+     }
++    public static void CallShowDialogue(DialogueSO dialogueData)//调用显示对话框事件
++    {
++        showDialogue?.Invoke(dialogueData);
++    }
+ }
+diff --git a/Assets/Scripts/GameData/ItemData/MapCell.cs b/Assets/Scripts/GameData/ItemData/MapCell.cs
+index da2d5c3..84b34ea 100644
+--- a/Assets/Scripts/GameData/ItemData/MapCell.cs
++++ b/Assets/Scripts/GameData/ItemData/MapCell.cs
+@@ -22,19 +22,16 @@ public enum MapCellContent//地图网格单元格内容
+ 
+ public class MapCell//地图网格单元格数据
+ {
+-    Stack<int> step = new Stack<int>();//到达该单元格的步数
++
+     MapCellContent cellContent = MapCellContent.None;//单元格内容
+-    public int getStep => step.Peek();//获取到达该单元格的步数
++
+     string Id = "0";//单元格ID,管理门和钥匙的关系
+     public MapCellContent getCellContent => cellContent;//获取单元格内容
+     public void setCellContent(MapCellContent cellContent)//设置单元格内容
+     {
+         this.cellContent = cellContent;
+     }
+-    public void setStep(int step)//设置到达该单元格的步数
+-    {
+-        this.step.Push(step);
+-    }
++
+     public void SetId(string Id)//设置单元格ID
+     {
+         this.Id = Id;
+diff --git a/Assets/Scripts/Manager/GameManager.cs b/Assets/Scripts/Manager/GameManager.cs
+index 3a2453e..2a45a02 100644
+--- a/Assets/Scripts/Manager/GameManager.cs
++++ b/Assets/Scripts/Manager/GameManager.cs
+@@ -1,5 +1,6 @@
+ using System.Collections;
+ using System.Collections.Generic;
++using Unity.Collections;
+ using UnityEngine;
+ using UnityEngine.SceneManagement;
+ [System.Serializable]
+@@ -18,7 +19,8 @@ public class GameManager : SingletonMono<GameManager>
+     [SerializeField] private int maxPassWallCount = 1;//穿墙最大蓝条量
+     [SerializeField] private int maxBreakWallCount = 1;//破坏墙最大蓝条量
+     [SerializeField] private int maxFlyCount = 1;//飞行最大蓝条量
+-
++    [SerializeField] private int passWallCell = 1;//穿墙可以穿过几个墙单元格
++    [SerializeField] private int flyCell = 1;//飞行可以飞行几个墙单元格
+ 
+     public int getEndStepCount => endStepCount;//获取走过了几次终点
+     public bool IsPlayerMoving => isPlayerMoving;//是否玩家正在移动
+@@ -47,12 +49,14 @@ public class GameManager : SingletonMono<GameManager>
+         EventHandler.playerUseSkill += UseSkill;
+         EventHandler.updateCard += SetCardData;
+         EventHandler.playerMove += OnPlayerMove;
++        EventHandler.levelLoaded += SetCardNumber;
+     }
+     void OnDisable()
+     {
+         EventHandler.playerUseSkill -= UseSkill;
+         EventHandler.updateCard -= SetCardData;
+         EventHandler.playerMove -= OnPlayerMove;
++        EventHandler.levelLoaded -= SetCardNumber;
+     }
+ 
+     void Start()
+@@ -67,7 +71,19 @@ public class GameManager : SingletonMono<GameManager>
+     }
+     public void SetCardData()//设置传入卡牌数据
+     {
++        List<CardData> removeCardList = new List<CardData>();//移除卡片列表
+         this.cardData = LevelManager.Instance.GetCardData(ChapterNumber, levelNumber, endStepCount);//传入卡牌数据赋值
++        foreach (CardData card in cardData)//遍历卡牌数据
++        {
++            if (card.getCardType == PlayerState.Fly && flyCount <= 0 || card.getCardType == PlayerState.PassWall && passWallCount <= 0 || card.getCardType == PlayerState.BreakWall && breakWallCount <= 0)//如果飞行蓝条量小于等于0或穿墙蓝条量小于等于0或破坏墙蓝条量小于等于0
++            {
++                removeCardList.Add(card);//移除卡片列表
++            }
++        }
++        foreach (CardData card in removeCardList)//遍历移除卡片列表
++        {
++            RemoveCardFromData(card);//移除卡片
++        }
+     }
+ 
+ 
+@@ -76,7 +92,21 @@ public class GameManager : SingletonMono<GameManager>
+         endStepCount++;//走过了几次终点增加
+         if (endStepCount > LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getEndStepCount)//如果走过了几次终点大于等于需要走过了几次终点
+         {
+-            StartCoroutine(LoadNextLevel());//加载下一关
++            string currentSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//获取当前场景名称
++            levelNumber++;//关卡编号增加
++            if (levelNumber > LevelManager.Instance.getChapter.getLevelManagement.Count)//如果关卡编号大于章节中的关卡数量
++            {
++                levelNumber = 1;//关卡编号重置为1
++                ChapterNumber++;//章节编号增加
++            }
++            string nextSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//下一关场景名称
++
++            if (LevelManager.Instance.getChapterNumber < ChapterNumber || LevelManager.Instance.getChapter.getLevelManagement.Count < levelNumber)//如果章节中的关卡数量等于关卡编号
++            {
++                StartCoroutine(LoadEndScene());//加载结束场景
++                return true;//返回true
++            }
++            StartCoroutine(LoadNextLevel(currentSceneName, nextSceneName));//加载下一关
+             EventHandler.CallUpdateCard();//调用更新卡牌数据事件
+             return true;//返回true
+         }
+@@ -87,18 +117,9 @@ public class GameManager : SingletonMono<GameManager>
+         }
+     }
+ 
+-    IEnumerator LoadNextLevel()//加载下一关
++    IEnumerator LoadNextLevel(string currentSceneName, string nextSceneName)//加载下一关
+     {
+         gameState = GameState.Pause;//游戏状态重置为暂停
+-        string currentSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//获取当前场景名称
+-        levelNumber++;//关卡编号增加
+-        if (levelNumber > LevelManager.Instance.getChapter.getLevelManagement.Count)//如果关卡编号大于章节中的关卡数量
+-        {
+-            levelNumber = 1;//关卡编号重置为1
+-            ChapterNumber++;//章节编号增加
+-        }
+-        string nextSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//下一关场景名称
+-
+         LoadSceneFadeOut();//加载场景淡出动画;
+         yield return new WaitForSeconds(0.5f);//等待0.5秒
+ 
+@@ -114,9 +135,22 @@ public class GameManager : SingletonMono<GameManager>
+         EventHandler.CallLevelLoaded();//调用关卡加载事件
+         LoadSceneFadeIn();//加载场景淡入动画
+ 
++        SetCardNumber();//设置卡牌蓝数目
++
++        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
++
++
++        yield return new WaitForSeconds(0.5f);//等待0.5秒
++
++        gameState = GameState.Play;//游戏状态重置为播放
++
++    }
++    void SetCardNumber()//设置卡牌蓝数目
++    {
+         List<CardDataManagement> cardList = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getCardData;//获取所有卡片数据
+         foreach (CardDataManagement card in cardList)//遍历所有卡片数据
+         {
++            Debug.Log($"卡片的类型为{card.getCardType}");
+             switch (card.getCardType)
+             {
+                 case PlayerState.Fly://飞行技能
+@@ -133,13 +167,6 @@ public class GameManager : SingletonMono<GameManager>
+         flyCount = maxFlyCount;//设置飞行蓝条量为最大蓝条量
+         passWallCount = maxPassWallCount;//设置穿墙最大蓝条量为最大蓝条量
+         breakWallCount = maxBreakWallCount;//设置破坏墙最大蓝条量为蓝条量
+-
+-
+-
+-        yield return new WaitForSeconds(0.5f);//等待0.5秒
+-
+-        gameState = GameState.Play;//游戏状态重置为播放
+-
+     }
+ 
+     public List<CardData> GetCardData()//获取传入卡牌数据
+@@ -161,19 +188,24 @@ public class GameManager : SingletonMono<GameManager>
+         switch (playerState)
+         {
+             case PlayerState.Fly://飞行技能
+-                flyCount--;//飞行蓝条量削减
++                flyCell--;//设置飞行削减
+                 break;
+             case PlayerState.PassWall://穿墙技能
+-                passWallCount--;//穿墙蓝条量削减
+-                break;
+-            case PlayerState.BreakWall://破坏墙技能
+-                breakWallCount--;//破坏墙蓝条量削减
++                passWallCell--;//设置穿墙削减
+                 break;
+         }
+-        if (flyCount <= 0 || passWallCount <= 0 || breakWallCount <= 0)//如果飞行蓝条量小于穿墙蓝条量小于破坏墙蓝条量小于等于0
++        if (flyCell == -1 || passWallCell == -1)//如果飞行蓝或穿墙小于0
+         {
+-            playerState = PlayerState.Stand;//设置玩家状态为站立
+-            EventHandler.CallPlayerStand();//调用更新卡牌数据事件
++            playerState = PlayerState.Stand;//设置玩家状态为站立        
++            EventHandler.CallPlayerStand();//调用更新玩家状态事件
++            if (flyCell == -1)//如果飞行蓝小于0
++            {
++                flyCell = -2;
++            }
++            if (passWallCell == -1)//如果穿墙小于0` 
++            {
++                passWallCell = -2;
++            }
+             Debug.Log("玩家退出特殊状态");//输出玩家状态为站立日志
+         }
+ 
+@@ -181,27 +213,53 @@ public class GameManager : SingletonMono<GameManager>
+ 
+     public void UseSkill(CardData card)//使用技能 
+     {
+-        if (playerState == PlayerState.Stand)//如果玩家状态为站立
++
++        if (card.getCardType == PlayerState.Fly && flyCount > 0)//飞行技能且蓝条量大于0
+         {
+-            switch (card.getCardType)
+-            {
+-                case PlayerState.Fly://飞行技能
+-                    playerState = PlayerState.Fly;//设置玩家状态为飞行
+-                    break;
+-                case PlayerState.PassWall://穿墙技能
+-                    playerState = PlayerState.PassWall;//设置玩家状态为穿墙
+-                    break;
+-                case PlayerState.BreakWall://破坏墙技能
+-                    playerState = PlayerState.BreakWall;//设置玩家状态为破坏墙
+-                    break;
+-            }
++            playerState = PlayerState.Fly;//设置玩家状态为飞行
++            flyCount--;//飞行蓝条量削减
++            flyCell = 1;//设置飞行蓝条量为穿墙单元格
++        }
++        else if (card.getCardType == PlayerState.PassWall && passWallCount > 0)//穿墙技能且蓝条量大于0
++        {
++            playerState = PlayerState.PassWall;//设置玩家状态为穿墙
++            passWallCount--;//穿墙蓝条量削减
++            passWallCell = 1;//设置穿墙蓝条量为穿墙单元格
++
++        }
++        else if (card.getCardType == PlayerState.BreakWall && breakWallCount > 0)//破坏墙技能且蓝条量大于0
++        {
++            playerState = PlayerState.BreakWall;//设置玩家状态为破坏墙
++            breakWallCount--;//破坏墙蓝条量削减
+         }
+         else
+         {
+-            Debug.Log("玩家非站立状态不能使用技能");
++            // 如果蓝条量不足，给出提示
++            string skillName = card.getCardName;
++            Debug.LogWarning($"无法使用{skillName}技能，蓝条量不足");
+         }
++        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
+     }
++    void RemoveCardFromData(CardData cardToRemove)
++    {
++        if (cardData == null || cardToRemove == null)
++        {
++            Debug.LogWarning("卡牌数据为空或要移除的卡牌为空");
++            return;
++        }
+ 
++        // 查找并移除卡牌
++        int removedCount = cardData.RemoveAll(card => card == cardToRemove);
++
++        if (removedCount > 0)
++        {
++            Debug.Log($"成功移除卡牌: {cardToRemove.getCardName}，移除数量: {removedCount}");
++        }
++        else
++        {
++            Debug.LogWarning($"未找到要移除的卡牌: {cardToRemove.getCardName}");
++        }
++    }
+     /// <summary>
+     /// 重新加载当前关卡（重置游戏状态但保持同一关卡）
+     /// </summary>
+@@ -235,7 +293,6 @@ public class GameManager : SingletonMono<GameManager>
+ 
+         // 6. 重置游戏状态
+         ResetGameStateForReload();
+-
+         // 7. 播放淡入动画并恢复游戏
+         LoadSceneFadeIn();
+         gameState = GameState.Play;
+@@ -265,8 +322,43 @@ public class GameManager : SingletonMono<GameManager>
+ 
+         // 触发关卡加载事件
+         EventHandler.CallLevelLoaded();
+-
++        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
+         Debug.Log("游戏状态已重置");
+     }
+ 
++    public int GetCardUseData(string cardName)//获取卡牌使用次数
++    {
++        foreach (var item in cardData)
++        {
++            if (item.getCardName == cardName)
++            {
++                switch (item.getCardType)
++                {
++                    case PlayerState.Fly://飞行技能
++                        return flyCount;
++                    case PlayerState.PassWall://穿墙技能
++                        return passWallCount;
++                    case PlayerState.BreakWall://破坏墙技能
++                        return breakWallCount;
++                }
++            }
++        }
++        return 0;
++    }
++
++    IEnumerator LoadEndScene()
++    {
++        gameState = GameState.Pause;//游戏状态重置为暂停
++
++        // 播放淡出动画
++        LoadSceneFadeOut();
++        yield return new WaitForSeconds(0.5f);//等待0.5秒
++
++
++        // 加载结束场景（单场景模式）
++        yield return SceneManager.LoadSceneAsync("END", LoadSceneMode.Single);
++        LoadSceneFadeIn();//播放淡入动画
++        yield return new WaitForSeconds(0.5f);//等待0.5秒
++
++    }
+ }
+diff --git a/Assets/Scripts/Manager/LevelManager.cs b/Assets/Scripts/Manager/LevelManager.cs
+index 965b9e1..53ca3fb 100644
+--- a/Assets/Scripts/Manager/LevelManager.cs
++++ b/Assets/Scripts/Manager/LevelManager.cs
+@@ -74,6 +74,7 @@ public class LevelManager : SingletonMono<LevelManager>
+     public List<CardData> getCardData => cardData.getCardList;//获取卡牌数据
+     [Header("章节信息")]
+     [SerializeField] private List<ChapterManagement> Chapter = new List<ChapterManagement>();//章节编号
++    public int getChapterNumber => Chapter.Count;//获取章节数量
+     public ChapterManagement getChapter => Chapter[GameManager.Instance.getChapterNumber - 1];//获取章节编号
+ 
+     public LevelManagement GetLevelManagement(int chapterNumber, int levelNumber)//获取关卡信息
+@@ -87,7 +88,7 @@ public class LevelManager : SingletonMono<LevelManager>
+         List<CardDataManagement> cardDataManagement = GetLevelManagement(chapterNumber, levelNumber).getCardData;//返回卡牌内容
+         foreach (CardDataManagement card in cardDataManagement)
+         {
+-            if (card.getRound == endStepCount)
++            if (card.getRound <= endStepCount)
+             {
+                 cardDataList.Add(getCardData.Find(x => x.getCardType == card.getCardType));//添加卡牌内容
+             }
+diff --git a/Assets/Scripts/Manager/MapManager.cs b/Assets/Scripts/Manager/MapManager.cs
+index f7ba5a5..638786c 100644
+--- a/Assets/Scripts/Manager/MapManager.cs
++++ b/Assets/Scripts/Manager/MapManager.cs
+@@ -78,7 +78,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
+ 
+         // 3. 其余代码保持不变...
+         playerPosition = levelManagement.getPlayerStartPosition;
+-        mapGrid[playerPosition.x, playerPosition.y].setStep(0);
++
+         mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Start);
+ 
+         for (int x = 0; x < levelManagement.getUnitPositions.Count; x++)
+@@ -263,7 +263,6 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
+     void PlayerMove(Vector2Int position)//玩家移动到新的单元格
+     {
+         MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
+-        mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setStep(playerCell.getStep + 1);//将玩家移动到新的单元格的步数设置为玩家所在单元格的步数加一
+         playerPosition = position + playerPosition;//将玩家移动到新的单元格 
+         EventHandler.CallPlayerMove();//调用改变玩家位置事件
+     }
+@@ -406,10 +405,16 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
+             GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
+             Debug.LogWarning("玩家在水单元格");
+         }
+-        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.None)//如果玩家在空单元格
++        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Wall)//如果玩家在墙单元格
+         {
+             GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
+-            Debug.LogWarning("玩家在空单元格");
++            Debug.LogWarning("玩家在墙单元格");
+         }
++        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Wall_unbreakable)//如果玩家在钥匙单元格
++        {
++            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
++            Debug.LogWarning("玩家在不可破坏的墙单元格");
++        }
++
+     }
+ }
+\ No newline at end of file
+diff --git a/Assets/Scripts/Manager/UIManager.cs b/Assets/Scripts/Manager/UIManager.cs
+index 327cdbb..1ac275b 100644
+--- a/Assets/Scripts/Manager/UIManager.cs
++++ b/Assets/Scripts/Manager/UIManager.cs
+@@ -2,26 +2,77 @@ using System.Collections;
+ using System.Collections.Generic;
+ using UnityEngine;
+ using UnityEngine.UI;
++using TMPro;
+ 
+ [System.Serializable]
+ 
+ public class UIManager : MonoBehaviour
+ {
+     [SerializeField] private List<CardData> cardData;//卡牌数据
++    [SerializeField] private bool isClicked = false;//是否点击了对话框
+     void OnEnable()
+     {
+         EventHandler.updateCard += SetCardData;
++        EventHandler.showDialogue += HaveDialogue;
+     }
+     void OnDisable()
+     {
+         EventHandler.updateCard -= SetCardData;
++        EventHandler.showDialogue -= HaveDialogue;
+     }
+     [Header("卡牌")]
+     [SerializeField] private GameObject card;//卡牌图片
++    [SerializeField] private GameObject dialogueContainer;//对话框
++    private Dictionary<string, GameObject> createdCardInstances = new Dictionary<string, GameObject>();
+ 
+     void Start()
+     {
+-        SetCardData();//设置传牌数据
++
++    }
++
++    void HaveDialogue(DialogueSO dialogueData)
++    {
++        DialogueShow();
++        // 显示对话内容
++        EventHandler.onMouseLeftClick += CheckClicked;
++        TextMeshProUGUI dialogueText = dialogueContainer.GetComponentInChildren<TextMeshProUGUI>();
++        StartCoroutine(ShowDialogue(dialogueText, dialogueData));
++        EventHandler.onMouseLeftClick -= CheckClicked;
++        DialogueHide();
++    }
++
++    IEnumerator ShowDialogue(TextMeshProUGUI dialogueText, DialogueSO dialogueData)
++    {
++        foreach (var dialogue in dialogueData.getDialogues)
++        {
++            // 显示对话内容
++            dialogueText.text = dialogue.getDialogue;
++            yield return WaitForInput();
++        }
++    }
++    void CheckClicked(Vector2 position)//检查是否点击了对话框
++    {
++        isClicked = true;
++    }
++
++    IEnumerator WaitForInput()
++    {
++        while (!isClicked)
++        {
++
++            yield return null;
++        }
++        isClicked = false;
++        yield return new WaitForSeconds(0.5f);
++    }
++
++    void DialogueShow()
++    {
++        dialogueContainer.SetActive(true);
++    }
++    void DialogueHide()
++    {
++        dialogueContainer.SetActive(false);
+     }
+ 
+     public void SetCardData()//设置传入卡牌数据
+@@ -29,28 +80,93 @@ public class UIManager : MonoBehaviour
+         StartCoroutine(UpdateCardData());//更新传牌数据
+ 
+     }
+-    IEnumerator UpdateCardData()//更新传牌数据
++    IEnumerator UpdateCardData()//更新传牌数据 
+     {
+         yield return null;
+-        this.cardData = GameManager.Instance.GetCardData();//传入卡牌数据赋值
+-        Debug.Log(this.cardData[0].getCardName);
+-        GameObject targetSceneRoot = GameObject.Find($"卡牌容器"); // 找到目标场景的根节点
++        this.cardData = GameManager.Instance.GetCardData();//传入卡牌数据赋值 
++        GameObject targetSceneRoot = GameObject.Find($"卡牌容器"); // 找到目标场景的根节点 
++
++        // 清理不存在的卡牌数据对应的实例
++        CleanupOrphanedInstances();
++
+         foreach (var item in cardData)
+         {
+-            GameObject cardImage = CreateCardImage(item);
+-            cardImage.transform.SetParent(targetSceneRoot.GetComponent<RectTransform>());
++            // 检查是否已经创建过这个卡牌的实例
++            if (!createdCardInstances.ContainsKey(item.getCardName))
++            {
++                CreateCardImage(item, targetSceneRoot);
++            }
++            else
++            {
++                // 如果已经存在，更新现有实例而不是创建新的
++                UpdateExistingCardImage(item, createdCardInstances[item.getCardName]);
++            }
+         }
+     }
+-    GameObject CreateCardImage(CardData cardData)//创建卡牌按钮
++
++    void CreateCardImage(CardData cardData, GameObject parent)
++    {
++        // 创建新的卡牌UI实例
++        GameObject cardInstance = Instantiate(card, parent.transform);
++
++        // 设置卡牌数据
++        SetupCardUI(cardInstance, cardData);
++
++        // 添加到管理字典
++        createdCardInstances[cardData.getCardName] = cardInstance;
++
++    }
++
++    void UpdateExistingCardImage(CardData cardData, GameObject existingInstance)
++    {
++        // 更新现有实例的数据
++        SetupCardUI(existingInstance, cardData);
++    }
++
++    void SetupCardUI(GameObject cardInstance, CardData cardData)
+     {
+-        GameObject cardImage = Instantiate(card);
+-        CardLogic cardLogic = cardImage.GetComponent<CardLogic>();
+-        Debug.Log(cardLogic);
++        CardLogic cardLogic = cardInstance.GetComponent<CardLogic>();
+         if (cardLogic == null)
+         {
+-            cardLogic = cardImage.AddComponent<CardLogic>();
++            card.AddComponent<CardLogic>();
+         }
+         cardLogic.SetCardData(cardData);
+-        return cardImage;
++        cardLogic.SetUseImage();
++        cardLogic.SetUseCount(GameManager.Instance.GetCardUseData(cardData.getCardName));
++
++    }
++
++
++
++    void CleanupOrphanedInstances()
++    {
++        // 找出需要清理的实例（卡牌数据中不存在的ID）
++        List<string> keysToRemove = new List<string>();
++
++        foreach (var kvp in createdCardInstances)
++        {
++            string cardId = kvp.Key;
++            GameObject instance = kvp.Value;
++
++            // 检查这个ID是否还在当前的cardData中
++            bool stillExists = cardData.Exists(card => card.getCardName == cardId);
++
++            if (!stillExists)
++            {
++                // 如果卡牌数据中不存在这个ID，标记为需要清理
++                keysToRemove.Add(cardId);
++                if (instance != null)
++                {
++                    Destroy(instance);
++                    Debug.Log($"清理孤立的卡牌实例: {cardId}");
++                }
++            }
++        }
++
++        // 从字典中移除
++        foreach (string key in keysToRemove)
++        {
++            createdCardInstances.Remove(key);
++        }
+     }
+ }
+diff --git a/Assets/Scripts/UIlogic/CardButton.cs b/Assets/Scripts/UIlogic/CardButton.cs
+index 8114087..4ea1b53 100644
+--- a/Assets/Scripts/UIlogic/CardButton.cs
++++ b/Assets/Scripts/UIlogic/CardButton.cs
+@@ -15,9 +15,10 @@ public class CardButton : MonoBehaviour
+     [SerializeField] private Vector2Int expandPosition;
+     [SerializeField] private CardData cardData;
+     private RectTransform rectTransform;
++    [SerializeField] private Image parent;
+     void Start()
+     {
+-        rectTransform = GetComponent<RectTransform>();
++        rectTransform = parent.GetComponent<RectTransform>();
+         image = GetComponent<Image>();
+         image.sprite = sprites[0];
+         // 初始化位置为隐藏位置
+diff --git a/Assets/Scripts/UIlogic/CardLogic.cs b/Assets/Scripts/UIlogic/CardLogic.cs
+index 2720fb9..8e3013a 100644
+--- a/Assets/Scripts/UIlogic/CardLogic.cs
++++ b/Assets/Scripts/UIlogic/CardLogic.cs
+@@ -2,15 +2,334 @@ using System.Collections;
+ using System.Collections.Generic;
+ using UnityEngine;
+ using UnityEngine.UI;
+-[System.Serializable]
++using UnityEngine.EventSystems;
++using TMPro;
+ 
+-public class CardLogic : MonoBehaviour
++[System.Serializable]
++public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+ {
+     [SerializeField] private CardData cardData;
++    [SerializeField] private int useCount;//使用次数
++    [SerializeField] private TextMeshProUGUI useCountText;//使用次数文本
++    [SerializeField] private Image useImage;//使用图片
++    [SerializeField] private Image cardDetail;//卡牌图片
++    [SerializeField] private TextMeshProUGUI cardDetailText;//卡牌详情文本
++    [SerializeField] private TextMeshProUGUI cardNameText;//卡牌详情文本2
++    // 拖拽相关变量
++    private bool isMouseOver = false; // 鼠标是否悬停
++    [SerializeField] private bool isDragging = false; // 是否正在拖拽
++    [SerializeField] private Vector3 originalPosition; // 原始位置（在GridLayout中的位置）
++    [SerializeField] private Vector3 offset; // 鼠标点击位置与物体中心的偏移
++    private RectTransform rectTransform; // RectTransform组件
++    private Canvas parentCanvas; // 父级Canvas
++    private GridLayoutGroup parentGridLayout; // 父级GridLayout组件
++    private Transform originalParent; // 原始父级（GridLayout容器）
++    private Transform dragParent; // 拖拽时的父级（通常是Canvas）
++    private Vector3 currentPosition; // 当前位置（在Canvas中的位置）
++
++    // 纵坐标判断阈值
++    [SerializeField] private float useCardThreshold = 100f; // 触发UseCard方法的纵坐标阈值
++
++    void Start()
++    {
++        // 获取必要的组件
++        rectTransform = GetComponent<RectTransform>();
++        parentCanvas = GetComponentInParent<Canvas>();
++        parentGridLayout = GetComponentInParent<GridLayoutGroup>();
++        originalParent = transform.parent;
++
++        // 设置拖拽时的父级（通常是Canvas的直接子级）
++        if (parentCanvas != null)
++        {
++            GameObject dragParentObj = new GameObject("DragParent");
++            dragParent = dragParentObj.transform;
++            dragParent.SetParent(parentCanvas.transform);
++            dragParentObj.AddComponent<RectTransform>();
++        }
++
++        // 记录原始位置
++        originalPosition = rectTransform.anchoredPosition;
++    }
++
++    void Update()
++    {
++        // 如果正在拖拽，更新物体位置
++        if (isDragging)
++        {
++            UpdateDragPosition();
++        }
++    }
++    // 鼠标悬停进入
++    public void OnPointerEnter(PointerEventData eventData)
++    {
++        isMouseOver = true;
++        cardDetail.gameObject.SetActive(true);
++        cardDetailText.text = cardData.getCardDescription;
++        cardNameText.text = cardData.getCardName;
++
++        OnMouseSelected();
++
++    }
++
++    // 鼠标悬停离开
++    public void OnPointerExit(PointerEventData eventData)
++    {
++        isMouseOver = false;
++        cardDetail.gameObject.SetActive(false);
++        OnMouseDeselected();
++
++
++    }
++
++    // 鼠标按下（开始拖拽）
++    public void OnPointerDown(PointerEventData eventData)
++    {
++        if (eventData.button == PointerEventData.InputButton.Left)
++        {
++            cardDetail.gameObject.SetActive(false);
++            StartDrag(eventData);
++        }
++    }
++
++    // 鼠标释放（结束拖拽）
++    public void OnPointerUp(PointerEventData eventData)
++    {
++        if (eventData.button == PointerEventData.InputButton.Left && isDragging)
++        {
++            EndDrag();
++        }
++    }
++    /// <summary>
++    /// 开始拖拽 - 修复版本
++    /// </summary>
++    void StartDrag(PointerEventData eventData)
++    {
++        isDragging = true;
++
++        // 记录原始位置
++        originalPosition = rectTransform.anchoredPosition;
++
++        // 更精确的偏移计算
++        if (parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
++        {
++            // Overlay模式：直接使用屏幕坐标计算偏移
++            offset = rectTransform.position - (Vector3)eventData.position;
++        }
++        else
++        {
++            // Camera模式：使用局部坐标计算偏移
++            Vector2 localPoint;
++            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
++                rectTransform, eventData.position, eventData.pressEventCamera, out localPoint))
++            {
++                offset = rectTransform.anchoredPosition - localPoint;
++            }
++            else
++            {
++                // 备用方案：使用屏幕坐标
++                offset = rectTransform.position - (Vector3)eventData.position;
++            }
++        }
++
++        // 切换到拖拽父级，避免受GridLayout影响
++        if (dragParent != null)
++        {
++            transform.SetParent(dragParent);
++        }
++
++        // 设置到最上层
++        transform.SetAsLastSibling();
++
++    }
++    /// <summary>
++    /// 鼠标悬停时调用的方法
++    /// </summary>
++    void OnMouseSelected()
++    {
++        // 悬停效果：放大10%
++        transform.localScale = Vector3.one * 1.1f;
++    }
++
++    /// <summary>
++    /// 鼠标离开时调用的方法
++    /// </summary>
++    void OnMouseDeselected()
++    {
++        // 如果不是正在拖拽，恢复原始大小
++        if (!isDragging)
++        {
++            transform.localScale = Vector3.one;
++        }
++
++    }
++    /// <summary>
++    /// 更新拖拽位置 - 修复版本
++    /// </summary>
++    void UpdateDragPosition()
++    {
++        if (!isDragging) return;
++
++        // 方法1：直接使用鼠标屏幕坐标（最简单有效）
++        Vector3 mouseScreenPos = Input.mousePosition;
++
++        // 根据Canvas渲染模式选择正确的坐标转换方式
++        if (parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
++        {
++            // Screen Space - Overlay 模式：直接使用屏幕坐标
++            rectTransform.position = mouseScreenPos + offset;
++            currentPosition = rectTransform.anchoredPosition;
++        }
++        else
++        {
++            // Screen Space - Camera 模式：使用摄像机坐标转换
++            Vector2 localPoint;
++            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
++                parentCanvas.transform as RectTransform,
++                mouseScreenPos,
++                parentCanvas.worldCamera,
++                out localPoint))
++            {
++                rectTransform.anchoredPosition = localPoint + (Vector2)offset;
++            }
++            else
++            {
++                // 备用方案：直接使用屏幕坐标
++                rectTransform.position = mouseScreenPos + offset;
++            }
++            currentPosition = rectTransform.anchoredPosition;
++        }
++
++
++    }
++    /// <summary>
++    /// 结束拖拽
++    /// </summary>
++    void EndDrag()
++    {
++        isDragging = false;
++        // 检查纵坐标是否超过阈值
++        CheckVerticalPosition();
++
++        // 回到GridLayout容器并重新排列
++        ReturnToGridLayout();
++
++        // 恢复原始大小
++        transform.localScale = Vector3.one;
++
++    }
++
++    /// <summary>
++    /// 检查纵坐标并决定是否执行UseCard方法
++    /// </summary>
++    void CheckVerticalPosition()
++    {
++        // 获取当前世界坐标的Y值
++        float currentY = currentPosition.y;
++
++        // 获取原始位置的世界坐标Y值（作为参考点）
++        float originalY = originalPosition.y;
++
++        // 计算与原始位置的垂直距离
++        float verticalDistance = Mathf.Abs(currentY - originalY);
++
++
++        // 如果垂直距离超过阈值，执行UseCard方法
++        if (verticalDistance > useCardThreshold)
++        {
++            UseCard();
++        }
++    }
++
++
++    void UseCard()
++    {
++
++        EventHandler.CallPlayerUseSkill(cardData);
++
++
++    }
++
++    /// <summary>
++    /// 回到GridLayout容器并重新排列
++    /// </summary>
++    void ReturnToGridLayout()
++    {
++        // 回到原始父级
++        transform.SetParent(originalParent);
+ 
++        // 平滑回到原始位置
++        StartCoroutine(SmoothReturnToGrid());
++    }
++
++    /// <summary>
++    /// 平滑回到GridLayout中的位置
++    /// </summary>
++    IEnumerator SmoothReturnToGrid()
++    {
++        Vector3 startPos = rectTransform.anchoredPosition;
++        float duration = 0.3f; // 返回动画时长
++        float elapsed = 0f;
++
++        while (elapsed < duration)
++        {
++            elapsed += Time.deltaTime;
++            float progress = elapsed / duration;
++
++            // 使用缓动函数使动画更平滑
++            rectTransform.anchoredPosition = Vector3.Lerp(startPos, originalPosition, progress);
++
++            yield return null;
++        }
++
++        // 确保最终位置准确
++        rectTransform.anchoredPosition = originalPosition;
++
++        // 强制刷新GridLayout（确保正确排列）
++        if (parentGridLayout != null)
++        {
++            LayoutRebuilder.ForceRebuildLayoutImmediate(parentGridLayout.GetComponent<RectTransform>());
++        }
++    }
++
++    /// <summary>
++    /// 强制停止拖拽（外部调用）
++    /// </summary>
++    public void ForceStopDrag()
++    {
++        if (isDragging)
++        {
++            EndDrag();
++        }
++    }
++
++    /// <summary>
++    /// 更新原始位置（当GridLayout发生变化时调用）
++    /// </summary>
++    public void UpdateOriginalPosition()
++    {
++        originalPosition = rectTransform.anchoredPosition;
++    }
++
++    // 原有的方法保持不变
+     public void SetCardData(CardData cardData)
+     {
+         this.cardData = cardData;
+     }
+ 
+-}
++    public void SetUseCount(int count)
++    {
++        useCount = count;
++        useCountText.text = useCount.ToString();
++    }
++
++    public void SetUseImage()
++    {
++        useImage.sprite = cardData.getCardSprite;
++    }
++
++    // 公共属性访问
++    public bool IsDragging => isDragging;
++    public bool IsMouseOver => isMouseOver;
++    public Vector3 OriginalPosition => originalPosition;
++    public CardData GetCardData => cardData;
++}
+\ No newline at end of file
+diff --git a/Assets/Scripts/UIlogic/ChapterReminder.cs b/Assets/Scripts/UIlogic/ChapterReminder.cs
+new file mode 100644
+index 0000000..47f0225
+--- /dev/null
++++ b/Assets/Scripts/UIlogic/ChapterReminder.cs
+@@ -0,0 +1,23 @@
++using System.Collections;
++using System.Collections.Generic;
++using TMPro;
++using UnityEngine;
++using UnityEngine.UI;
++[System.Serializable]
++public class ChapterReminder : MonoBehaviour
++{
++    [SerializeField] private TextMeshProUGUI chapterReminderText;//章节提醒文本
++    void OnEnable()
++    {
++        EventHandler.levelLoaded += OnLevelLoaded;
++    }
++    void OnDisable()
++    {
++        EventHandler.levelLoaded -= OnLevelLoaded;
++    }
++
++    void OnLevelLoaded()
++    {
++        chapterReminderText.text = $"Chapter{GameManager.Instance.getChapterNumber} Level{GameManager.Instance.getLevelNumber}";
++    }
++}
+diff --git a/Assets/Scripts/UIlogic/ChapterReminder.cs.meta b/Assets/Scripts/UIlogic/ChapterReminder.cs.meta
+new file mode 100644
+index 0000000..2fe6a2a
+--- /dev/null
++++ b/Assets/Scripts/UIlogic/ChapterReminder.cs.meta
+@@ -0,0 +1,11 @@
++fileFormatVersion: 2
++guid: 46d43a0207eada14aa210542a69d7d12
++MonoImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  defaultReferences: []
++  executionOrder: 0
++  icon: {instanceID: 0}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/Assets/Scripts/UIlogic/Pause.cs b/Assets/Scripts/UIlogic/Pause.cs
+new file mode 100644
+index 0000000..990297f
+--- /dev/null
++++ b/Assets/Scripts/UIlogic/Pause.cs
+@@ -0,0 +1,26 @@
++using System.Collections;
++using System.Collections.Generic;
++using UnityEngine;
++using UnityEngine.UI;
++[System.Serializable]
++public class Pause : MonoBehaviour
++{
++    [SerializeField] private Image pauseImage;//暂停图片
++    bool isPaused = false;//是否暂停
++    public void PauseGame()
++    {
++        if (!isPaused)
++        {
++            isPaused = true;//设置暂停为true
++            GameManager.Instance.SetGameState(GameState.Pause);
++            pauseImage.gameObject.SetActive(true);
++        }
++        else
++        {
++            isPaused = false;//设置暂停为false
++            GameManager.Instance.SetGameState(GameState.Play);
++            pauseImage.gameObject.SetActive(false);
++        }
++    }
++
++}
+diff --git a/Assets/Scripts/UIlogic/Pause.cs.meta b/Assets/Scripts/UIlogic/Pause.cs.meta
+new file mode 100644
+index 0000000..3977dd5
+--- /dev/null
++++ b/Assets/Scripts/UIlogic/Pause.cs.meta
+@@ -0,0 +1,11 @@
++fileFormatVersion: 2
++guid: 44716758dd7ea094ebe3fa354d15058f
++MonoImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  defaultReferences: []
++  executionOrder: 0
++  icon: {instanceID: 0}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/Assets/Scripts/UIlogic/PauseButton.cs b/Assets/Scripts/UIlogic/PauseButton.cs
+new file mode 100644
+index 0000000..0f28301
+--- /dev/null
++++ b/Assets/Scripts/UIlogic/PauseButton.cs
+@@ -0,0 +1,17 @@
++using System.Collections;
++using System.Collections.Generic;
++using UnityEngine;
++
++public class PauseButton : MonoBehaviour
++{
++    [SerializeField] private Pause pause;//暂停
++    public void QuitGameButton()
++    {
++        Application.Quit();
++    }
++    public void ResumeGameButton()
++    {
++        GameManager.Instance.ReloadCurrentLevel();
++        pause.PauseGame();//暂停游戏
++    }
++}
+diff --git a/Assets/Scripts/UIlogic/PauseButton.cs.meta b/Assets/Scripts/UIlogic/PauseButton.cs.meta
+new file mode 100644
+index 0000000..278dba6
+--- /dev/null
++++ b/Assets/Scripts/UIlogic/PauseButton.cs.meta
+@@ -0,0 +1,11 @@
++fileFormatVersion: 2
++guid: a370d0336f860c4429c117d30b1a0ba0
++MonoImporter:
++  externalObjects: {}
++  serializedVersion: 2
++  defaultReferences: []
++  executionOrder: 0
++  icon: {instanceID: 0}
++  userData: 
++  assetBundleName: 
++  assetBundleVariant: 
+diff --git a/ProjectSettings/EditorBuildSettings.asset b/ProjectSettings/EditorBuildSettings.asset
+index 2641a03..2a93785 100644
+--- a/ProjectSettings/EditorBuildSettings.asset
++++ b/ProjectSettings/EditorBuildSettings.asset
+@@ -41,4 +41,7 @@ EditorBuildSettings:
+   - enabled: 1
+     path: Assets/Scenes/LevelManager.unity
+     guid: c585cba284df5a348a6afdc65b4e1087
++  - enabled: 1
++    path: Assets/Scenes/END.unity
++    guid: 3b6f9a8d143addd4ca1143d212213314
+   m_configObjects: {}
+-- 
+2.51.0.windows.1
+
