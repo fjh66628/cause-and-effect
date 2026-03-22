@@ -23,12 +23,10 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     void OnEnable()
     {
         EventHandler.levelLoaded += UpdateMapInfo;//注册关卡加载事件
-        EventHandler.playerStand += CheckPlayerPosition;//注册判断玩家在哪个位置事件
     }
     void OnDisable()
     {
         EventHandler.levelLoaded -= UpdateMapInfo;//注销关卡加载事件
-        EventHandler.playerStand -= CheckPlayerPosition;//注销判断玩家在哪个位置事件
     }
 
 
@@ -264,7 +262,6 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
         playerPosition = position + playerPosition;//将玩家移动到新的单元格 
-        EventHandler.CallPlayerMove();//调用改变玩家位置事件
     }
 
 
@@ -417,4 +414,5 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         }
 
     }
+
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 [System.Serializable]
 
@@ -23,13 +24,13 @@ public class CardDataManagement//关卡的卡牌内容
 {
     [Header("卡牌内容")]
     [SerializeField] private PlayerState cardType;//卡牌内容
-    public PlayerState getCardType => cardType;//获取卡牌
+    public PlayerState getCardType => cardType;//获取卡牌类型
     [Header("第几周目获得")]
     [SerializeField] private int round = 1;//第几回合获得
-    [Header("当前层数可以使用几次")]
-    [SerializeField] private int useCount = 1;//当前层数可以使用几次
+    [Header("使用几次")]
+    [SerializeField] private int useCount = 1;//使用几次
+    public int getUseCount => useCount;//获取使用几次
     public int getRound => round;//获取第几回合获得
-    public int getUseCount => useCount;//获取当前层数可以使用几次
 }
 
 [System.Serializable]
@@ -69,11 +70,11 @@ public class ChapterManagement//储存章节信息的数据结构
 [System.Serializable]
 public class LevelManager : SingletonMono<LevelManager>
 {
-    [Header("传入卡牌信息")]
-    [SerializeField] private CardDataSO cardData;//传入卡牌数据
-    public List<CardData> getCardData => cardData.getCardList;//获取卡牌数据
     [Header("章节信息")]
     [SerializeField] private List<ChapterManagement> Chapter = new List<ChapterManagement>();//章节编号
+    [Header("传入卡牌内容")]
+    [SerializeField] private CardDataSO cardData;//传入卡牌内容
+    public List<CardData> getCardData => cardData.getCardList;//获取传入卡牌内容
     public int getChapterNumber => Chapter.Count;//获取章节数量
     public ChapterManagement getChapter => Chapter[GameManager.Instance.getChapterNumber - 1];//获取章节编号
 
@@ -81,6 +82,7 @@ public class LevelManager : SingletonMono<LevelManager>
     {
         return Chapter[chapterNumber - 1].getLevelManagement[levelNumber - 1];
     }
+
 
     public List<CardData> GetCardData(int chapterNumber, int levelNumber, int endStepCount)//获取关卡的卡牌内容
     {
@@ -95,6 +97,7 @@ public class LevelManager : SingletonMono<LevelManager>
         }
         return cardDataList;
     }
+
 
 
     public Vector2Int getPlayerStartPosition => GetLevelManagement(GameManager.Instance.getChapterNumber, GameManager.Instance.getLevelNumber).getPlayerStartPosition;//获取玩家初始位置

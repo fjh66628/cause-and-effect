@@ -7,11 +7,10 @@ Shader "Unlit/StarfieldBackground"
         _Color2 ("Color2", Color) = (1, 0.9, 0.7, 1) 
         _Color3 ("Color3", Color) = (0.8, 0.9, 1.2, 1) 
         _StarDensity ("density", Range(0, 1)) = 0.6        // 每个格子出现星星的概率
-        _GridSize ("size of grid", Range(5, 100)) = 20           // 网格数量，越大星星越多
-        _BaseStarSize ("size", Range(0.01, 1)) = 0.8
+        _GridSize ("size of grid", Range(5, 50)) = 20           // 网格数量，越大星星越多
+        _BaseStarSize ("size", Range(0.1, 2)) = 0.8
         _TwinkleSpeed ("speed", Range(0.2, 5)) = 1.5
         _ColorVariation ("random range", Range(0, 1)) = 0.7 
-        _MovingSpeed ("moving speed", Range(0, 0.01)) = 0.001 
     }
     SubShader
     {
@@ -47,7 +46,6 @@ Shader "Unlit/StarfieldBackground"
             float _BaseStarSize;
             float _TwinkleSpeed;
             float _ColorVariation;
-            float _MovingSpeed;
 
             // 伪随机函数（输入二维，输出一维）
             float rand(float2 co)
@@ -71,8 +69,6 @@ Shader "Unlit/StarfieldBackground"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                i.uv += _MovingSpeed * _Time.y; // 让星空缓慢移动
-                i.uv = frac(i.uv); // 保持在 [0,1] 范围内
                 // 确定当前像素属于哪个网格
                 float2 gridPos = i.uv * _GridSize;
                 float2 cellIndex = floor(gridPos);           // 格子索引
