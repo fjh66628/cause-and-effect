@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4d61e75442b8764fa175e3bf69e1bc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardData: {fileID: 0}
   Chapter:
   - levelManagements:
     - playerStartPosition: {x: 0, y: 0}

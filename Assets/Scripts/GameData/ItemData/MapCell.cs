@@ -22,19 +22,16 @@ public enum MapCellContent//地图网格单元格内容
 
 public class MapCell//地图网格单元格数据
 {
-    Stack<int> step = new Stack<int>();//到达该单元格的步数
+
     MapCellContent cellContent = MapCellContent.None;//单元格内容
-    public int getStep => step.Peek();//获取到达该单元格的步数
+
     string Id = "0";//单元格ID,管理门和钥匙的关系
     public MapCellContent getCellContent => cellContent;//获取单元格内容
     public void setCellContent(MapCellContent cellContent)//设置单元格内容
     {
         this.cellContent = cellContent;
     }
-    public void setStep(int step)//设置到达该单元格的步数
-    {
-        this.step.Push(step);
-    }
+
     public void SetId(string Id)//设置单元格ID
     {
         this.Id = Id;

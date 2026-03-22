@@ -78,7 +78,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
 
         // 3. 其余代码保持不变...
         playerPosition = levelManagement.getPlayerStartPosition;
-        mapGrid[playerPosition.x, playerPosition.y].setStep(0);
+
         mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Start);
 
         for (int x = 0; x < levelManagement.getUnitPositions.Count; x++)
@@ -263,7 +263,6 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     void PlayerMove(Vector2Int position)//玩家移动到新的单元格
     {
         MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
-        mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].setStep(playerCell.getStep + 1);//将玩家移动到新的单元格的步数设置为玩家所在单元格的步数加一
         playerPosition = position + playerPosition;//将玩家移动到新的单元格 
         EventHandler.CallPlayerMove();//调用改变玩家位置事件
     }
@@ -406,10 +405,16 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
             Debug.LogWarning("玩家在水单元格");
         }
-        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.None)//如果玩家在空单元格
+        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Wall)//如果玩家在墙单元格
         {
             GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
-            Debug.LogWarning("玩家在空单元格");
+            Debug.LogWarning("玩家在墙单元格");
         }
+        else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Wall_unbreakable)//如果玩家在钥匙单元格
+        {
+            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
+            Debug.LogWarning("玩家在不可破坏的墙单元格");
+        }
+
     }
 }

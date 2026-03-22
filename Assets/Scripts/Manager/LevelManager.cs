@@ -74,6 +74,7 @@ public class LevelManager : SingletonMono<LevelManager>
     public List<CardData> getCardData => cardData.getCardList;//获取卡牌数据
     [Header("章节信息")]
     [SerializeField] private List<ChapterManagement> Chapter = new List<ChapterManagement>();//章节编号
+    public int getChapterNumber => Chapter.Count;//获取章节数量
     public ChapterManagement getChapter => Chapter[GameManager.Instance.getChapterNumber - 1];//获取章节编号
 
     public LevelManagement GetLevelManagement(int chapterNumber, int levelNumber)//获取关卡信息
@@ -87,7 +88,7 @@ public class LevelManager : SingletonMono<LevelManager>
         List<CardDataManagement> cardDataManagement = GetLevelManagement(chapterNumber, levelNumber).getCardData;//返回卡牌内容
         foreach (CardDataManagement card in cardDataManagement)
         {
-            if (card.getRound == endStepCount)
+            if (card.getRound <= endStepCount)
             {
                 cardDataList.Add(getCardData.Find(x => x.getCardType == card.getCardType));//添加卡牌内容
             }

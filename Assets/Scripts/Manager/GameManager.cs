@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 [System.Serializable]
@@ -18,7 +19,8 @@ public class GameManager : SingletonMono<GameManager>
     [SerializeField] private int maxPassWallCount = 1;//穿墙最大蓝条量
     [SerializeField] private int maxBreakWallCount = 1;//破坏墙最大蓝条量
     [SerializeField] private int maxFlyCount = 1;//飞行最大蓝条量
-
+    [SerializeField] private int passWallCell = 1;//穿墙可以穿过几个墙单元格
+    [SerializeField] private int flyCell = 1;//飞行可以飞行几个墙单元格
 
     public int getEndStepCount => endStepCount;//获取走过了几次终点
     public bool IsPlayerMoving => isPlayerMoving;//是否玩家正在移动
@@ -47,12 +49,14 @@ public class GameManager : SingletonMono<GameManager>
         EventHandler.playerUseSkill += UseSkill;
         EventHandler.updateCard += SetCardData;
         EventHandler.playerMove += OnPlayerMove;
+        EventHandler.levelLoaded += SetCardNumber;
     }
     void OnDisable()
     {
         EventHandler.playerUseSkill -= UseSkill;
         EventHandler.updateCard -= SetCardData;
         EventHandler.playerMove -= OnPlayerMove;
+        EventHandler.levelLoaded -= SetCardNumber;
     }
 
     void Start()
@@ -67,7 +71,19 @@ public class GameManager : SingletonMono<GameManager>
     }
     public void SetCardData()//设置传入卡牌数据
     {
+        List<CardData> removeCardList = new List<CardData>();//移除卡片列表
         this.cardData = LevelManager.Instance.GetCardData(ChapterNumber, levelNumber, endStepCount);//传入卡牌数据赋值
+        foreach (CardData card in cardData)//遍历卡牌数据
+        {
+            if (card.getCardType == PlayerState.Fly && flyCount <= 0 || card.getCardType == PlayerState.PassWall && passWallCount <= 0 || card.getCardType == PlayerState.BreakWall && breakWallCount <= 0)//如果飞行蓝条量小于等于0或穿墙蓝条量小于等于0或破坏墙蓝条量小于等于0
+            {
+                removeCardList.Add(card);//移除卡片列表
+            }
+        }
+        foreach (CardData card in removeCardList)//遍历移除卡片列表
+        {
+            RemoveCardFromData(card);//移除卡片
+        }
     }
 
 
@@ -76,7 +92,21 @@ public class GameManager : SingletonMono<GameManager>
         endStepCount++;//走过了几次终点增加
         if (endStepCount > LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getEndStepCount)//如果走过了几次终点大于等于需要走过了几次终点
         {
-            StartCoroutine(LoadNextLevel());//加载下一关
+            string currentSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//获取当前场景名称
+            levelNumber++;//关卡编号增加
+            if (levelNumber > LevelManager.Instance.getChapter.getLevelManagement.Count)//如果关卡编号大于章节中的关卡数量
+            {
+                levelNumber = 1;//关卡编号重置为1
+                ChapterNumber++;//章节编号增加
+            }
+            string nextSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//下一关场景名称
+
+            if (LevelManager.Instance.getChapterNumber < ChapterNumber || LevelManager.Instance.getChapter.getLevelManagement.Count < levelNumber)//如果章节中的关卡数量等于关卡编号
+            {
+                StartCoroutine(LoadEndScene());//加载结束场景
+                return true;//返回true
+            }
+            StartCoroutine(LoadNextLevel(currentSceneName, nextSceneName));//加载下一关
             EventHandler.CallUpdateCard();//调用更新卡牌数据事件
             return true;//返回true
         }
@@ -87,18 +117,9 @@ public class GameManager : SingletonMono<GameManager>
         }
     }
 
-    IEnumerator LoadNextLevel()//加载下一关
+    IEnumerator LoadNextLevel(string currentSceneName, string nextSceneName)//加载下一关
     {
         gameState = GameState.Pause;//游戏状态重置为暂停
-        string currentSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//获取当前场景名称
-        levelNumber++;//关卡编号增加
-        if (levelNumber > LevelManager.Instance.getChapter.getLevelManagement.Count)//如果关卡编号大于章节中的关卡数量
-        {
-            levelNumber = 1;//关卡编号重置为1
-            ChapterNumber++;//章节编号增加
-        }
-        string nextSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//下一关场景名称
-
         LoadSceneFadeOut();//加载场景淡出动画;
         yield return new WaitForSeconds(0.5f);//等待0.5秒
 
@@ -114,9 +135,22 @@ public class GameManager : SingletonMono<GameManager>
         EventHandler.CallLevelLoaded();//调用关卡加载事件
         LoadSceneFadeIn();//加载场景淡入动画
 
+        SetCardNumber();//设置卡牌蓝数目
+
+        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
+
+
+        yield return new WaitForSeconds(0.5f);//等待0.5秒
+
+        gameState = GameState.Play;//游戏状态重置为播放
+
+    }
+    void SetCardNumber()//设置卡牌蓝数目
+    {
         List<CardDataManagement> cardList = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getCardData;//获取所有卡片数据
         foreach (CardDataManagement card in cardList)//遍历所有卡片数据
         {
+            Debug.Log($"卡片的类型为{card.getCardType}");
             switch (card.getCardType)
             {
                 case PlayerState.Fly://飞行技能
@@ -133,13 +167,6 @@ public class GameManager : SingletonMono<GameManager>
         flyCount = maxFlyCount;//设置飞行蓝条量为最大蓝条量
         passWallCount = maxPassWallCount;//设置穿墙最大蓝条量为最大蓝条量
         breakWallCount = maxBreakWallCount;//设置破坏墙最大蓝条量为蓝条量
-
-
-
-        yield return new WaitForSeconds(0.5f);//等待0.5秒
-
-        gameState = GameState.Play;//游戏状态重置为播放
-
     }
 
     public List<CardData> GetCardData()//获取传入卡牌数据
@@ -161,19 +188,24 @@ public class GameManager : SingletonMono<GameManager>
         switch (playerState)
         {
             case PlayerState.Fly://飞行技能
-                flyCount--;//飞行蓝条量削减
+                flyCell--;//设置飞行削减
                 break;
             case PlayerState.PassWall://穿墙技能
-                passWallCount--;//穿墙蓝条量削减
-                break;
-            case PlayerState.BreakWall://破坏墙技能
-                breakWallCount--;//破坏墙蓝条量削减
+                passWallCell--;//设置穿墙削减
                 break;
         }
-        if (flyCount <= 0 || passWallCount <= 0 || breakWallCount <= 0)//如果飞行蓝条量小于穿墙蓝条量小于破坏墙蓝条量小于等于0
+        if (flyCell == -1 || passWallCell == -1)//如果飞行蓝或穿墙小于0
         {
-            playerState = PlayerState.Stand;//设置玩家状态为站立
-            EventHandler.CallPlayerStand();//调用更新卡牌数据事件
+            playerState = PlayerState.Stand;//设置玩家状态为站立        
+            EventHandler.CallPlayerStand();//调用更新玩家状态事件
+            if (flyCell == -1)//如果飞行蓝小于0
+            {
+                flyCell = -2;
+            }
+            if (passWallCell == -1)//如果穿墙小于0` 
+            {
+                passWallCell = -2;
+            }
             Debug.Log("玩家退出特殊状态");//输出玩家状态为站立日志
         }
 
@@ -181,27 +213,53 @@ public class GameManager : SingletonMono<GameManager>
 
     public void UseSkill(CardData card)//使用技能 
     {
-        if (playerState == PlayerState.Stand)//如果玩家状态为站立
+
+        if (card.getCardType == PlayerState.Fly && flyCount > 0)//飞行技能且蓝条量大于0
         {
-            switch (card.getCardType)
-            {
-                case PlayerState.Fly://飞行技能
-                    playerState = PlayerState.Fly;//设置玩家状态为飞行
-                    break;
-                case PlayerState.PassWall://穿墙技能
-                    playerState = PlayerState.PassWall;//设置玩家状态为穿墙
-                    break;
-                case PlayerState.BreakWall://破坏墙技能
-                    playerState = PlayerState.BreakWall;//设置玩家状态为破坏墙
-                    break;
-            }
+            playerState = PlayerState.Fly;//设置玩家状态为飞行
+            flyCount--;//飞行蓝条量削减
+            flyCell = 1;//设置飞行蓝条量为穿墙单元格
+        }
+        else if (card.getCardType == PlayerState.PassWall && passWallCount > 0)//穿墙技能且蓝条量大于0
+        {
+            playerState = PlayerState.PassWall;//设置玩家状态为穿墙
+            passWallCount--;//穿墙蓝条量削减
+            passWallCell = 1;//设置穿墙蓝条量为穿墙单元格
+
+        }
+        else if (card.getCardType == PlayerState.BreakWall && breakWallCount > 0)//破坏墙技能且蓝条量大于0
+        {
+            playerState = PlayerState.BreakWall;//设置玩家状态为破坏墙
+            breakWallCount--;//破坏墙蓝条量削减
         }
         else
         {
-            Debug.Log("玩家非站立状态不能使用技能");
+            // 如果蓝条量不足，给出提示
+            string skillName = card.getCardName;
+            Debug.LogWarning($"无法使用{skillName}技能，蓝条量不足");
+        }
+        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
+    }
+    void RemoveCardFromData(CardData cardToRemove)
+    {
+        if (cardData == null || cardToRemove == null)
+        {
+            Debug.LogWarning("卡牌数据为空或要移除的卡牌为空");
+            return;
+        }
+
+        // 查找并移除卡牌
+        int removedCount = cardData.RemoveAll(card => card == cardToRemove);
+
+        if (removedCount > 0)
+        {
+            Debug.Log($"成功移除卡牌: {cardToRemove.getCardName}，移除数量: {removedCount}");
+        }
+        else
+        {
+            Debug.LogWarning($"未找到要移除的卡牌: {cardToRemove.getCardName}");
         }
     }
-
     /// <summary>
     /// 重新加载当前关卡（重置游戏状态但保持同一关卡）
     /// </summary>
@@ -235,7 +293,6 @@ public class GameManager : SingletonMono<GameManager>
 
         // 6. 重置游戏状态
         ResetGameStateForReload();
-
         // 7. 播放淡入动画并恢复游戏
         LoadSceneFadeIn();
         gameState = GameState.Play;
@@ -265,8 +322,43 @@ public class GameManager : SingletonMono<GameManager>
 
         // 触发关卡加载事件
         EventHandler.CallLevelLoaded();
-
+        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
         Debug.Log("游戏状态已重置");
     }
 
+    public int GetCardUseData(string cardName)//获取卡牌使用次数
+    {
+        foreach (var item in cardData)
+        {
+            if (item.getCardName == cardName)
+            {
+                switch (item.getCardType)
+                {
+                    case PlayerState.Fly://飞行技能
+                        return flyCount;
+                    case PlayerState.PassWall://穿墙技能
+                        return passWallCount;
+                    case PlayerState.BreakWall://破坏墙技能
+                        return breakWallCount;
+                }
+            }
+        }
+        return 0;
+    }
+
+    IEnumerator LoadEndScene()
+    {
+        gameState = GameState.Pause;//游戏状态重置为暂停
+
+        // 播放淡出动画
+        LoadSceneFadeOut();
+        yield return new WaitForSeconds(0.5f);//等待0.5秒
+
+
+        // 加载结束场景（单场景模式）
+        yield return SceneManager.LoadSceneAsync("END", LoadSceneMode.Single);
+        LoadSceneFadeIn();//播放淡入动画
+        yield return new WaitForSeconds(0.5f);//等待0.5秒
+
+    }
 }

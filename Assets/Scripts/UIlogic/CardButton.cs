@@ -15,9 +15,10 @@ public class CardButton : MonoBehaviour
     [SerializeField] private Vector2Int expandPosition;
     [SerializeField] private CardData cardData;
     private RectTransform rectTransform;
+    [SerializeField] private Image parent;
     void Start()
     {
-        rectTransform = GetComponent<RectTransform>();
+        rectTransform = parent.GetComponent<RectTransform>();
         image = GetComponent<Image>();
         image.sprite = sprites[0];
         // 初始化位置为隐藏位置
