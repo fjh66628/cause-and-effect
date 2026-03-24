@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 [System.Serializable]
 public class PlayerMove : MonoBehaviour
@@ -7,6 +8,10 @@ public class PlayerMove : MonoBehaviour
     [Header("玩家移动参数")]
     [SerializeField] private float moveDuration = 0.4f;//移动时间
     [SerializeField] private Animator animator;//移动动画组件
+    [SerializeField] private GameObject direction_RU;//指示上方向的精灵
+    [SerializeField] private GameObject direction_RD;//指示下方向的精灵
+    [SerializeField] private GameObject direction_LU;//指示左方向的精灵
+    [SerializeField] private GameObject direction_LD;//指示右方向的精灵
     private MapManager mapManager;
     private void OnEnable()
     {
@@ -56,5 +61,47 @@ public class PlayerMove : MonoBehaviour
             mapManager.ChangePlayerPosition(direction);//改变玩家在地图中的坐标
         }
         StartCoroutine(ChangePosition(mapManager.GetPlayerWorldPosition()));//改变玩家在世界坐标中的位置
+    }
+
+    private void FixedUpdate()//固定时间步长更新
+    {
+
+        Vector2Int LU = new Vector2Int(1, 0);//获取玩家移动方向
+        Vector2Int RD = new Vector2Int(0, 1);//获取玩家移动方向
+        Vector2Int LD = new Vector2Int(-1, 0);//获取玩家移动方向
+        Vector2Int RU = new Vector2Int(0, -1);//获取玩家移动方向
+        Vector2Int input = mapManager.MoveDrection(InputManager.Instance.GetMoveDirection(), transform.position);
+        if (!GameManager.Instance.IsPlayerMoving)//如果玩家不是正在移动
+        {
+            if (input == LU)
+            {
+                direction_RU.gameObject.SetActive(true);//设置指示上方向的精灵
+                direction_RD.gameObject.SetActive(false);//设置指示下方向的精灵
+                direction_LU.gameObject.SetActive(false);//设置指示左方向的精灵
+                direction_LD.gameObject.SetActive(false);//设置指示右方向的精灵
+            }
+            else if (input == RD)
+            {
+                direction_RD.gameObject.SetActive(true);//设置指示下方向的精灵
+                direction_RU.gameObject.SetActive(false);//设置指示上方向的精灵
+                direction_LU.gameObject.SetActive(false);//设置指示左方向的精灵
+                direction_LD.gameObject.SetActive(false);//设置指示右方向的精灵
+            }
+            else if (input == LD)
+            {
+                direction_LU.gameObject.SetActive(true);//设置指示左方向的精灵
+                direction_RD.gameObject.SetActive(false);//设置指示下方向的精灵
+                direction_RU.gameObject.SetActive(false);//设置指示上方向的精灵
+                direction_LD.gameObject.SetActive(false);//设置指示右方向的精灵
+                direction_RU.gameObject.SetActive(false);//设置指示右方向的精灵
+            }
+            else if (input == RU)
+            {
+                direction_LD.gameObject.SetActive(true);//设置指示右方向的精灵
+                direction_RU.gameObject.SetActive(false);//设置指示上方向的精灵
+                direction_LU.gameObject.SetActive(false);//设置指示左方向的精灵
+                direction_RD.gameObject.SetActive(false);//设置指示下方向的精灵
+            }
+        }
     }
 }
