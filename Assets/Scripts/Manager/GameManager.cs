@@ -59,11 +59,7 @@ public class GameManager : SingletonMono<GameManager>
         EventHandler.levelLoaded -= SetCardNumber;
     }
 
-    void Start()
-    {
-        EventHandler.CallLevelLoaded();
-        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
-    }
+
 
     public void SetGameState(GameState state)//设置游戏状态
     {
@@ -103,15 +99,18 @@ public class GameManager : SingletonMono<GameManager>
 
             if (LevelManager.Instance.getChapterNumber < ChapterNumber || LevelManager.Instance.getChapter.getLevelManagement.Count < levelNumber)//如果章节中的关卡数量等于关卡编号
             {
+                LoadingAnimator.Instance.SetLoading("游戏结束");
                 StartCoroutine(LoadEndScene());//加载结束场景
                 return true;//返回true
             }
+            LoadingAnimator.Instance.SetLoading(nextSceneName);//加载下一关
             StartCoroutine(LoadNextLevel(currentSceneName, nextSceneName));//加载下一关
             EventHandler.CallUpdateCard();//调用更新卡牌数据事件
             return true;//返回true
         }
         else
         {
+            LoadingAnimator.Instance.SetLoading("史莱姆又踏上了轮回...");
             EventHandler.CallUpdateCard();//调用更新卡牌数据事件
             return false;//返回false
         }
@@ -140,7 +139,7 @@ public class GameManager : SingletonMono<GameManager>
         EventHandler.CallUpdateCard();//调用更新卡牌数据事件
 
 
-        yield return new WaitForSeconds(0.5f);//等待0.5秒
+        yield return new WaitForSeconds(2f);//等待2秒
 
         gameState = GameState.Play;//游戏状态重置为播放
 
@@ -150,7 +149,6 @@ public class GameManager : SingletonMono<GameManager>
         List<CardDataManagement> cardList = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getCardData;//获取所有卡片数据
         foreach (CardDataManagement card in cardList)//遍历所有卡片数据
         {
-            Debug.Log($"卡片的类型为{card.getCardType}");
             switch (card.getCardType)
             {
                 case PlayerState.Fly://飞行技能
@@ -206,14 +204,18 @@ public class GameManager : SingletonMono<GameManager>
             {
                 passWallCell = -2;
             }
-            Debug.Log("玩家退出特殊状态");//输出玩家状态为站立日志
+            MapManager mapManager = FindObjectOfType<MapManager>();//更新地图状态
+            mapManager.CheckPlayerPosition();//更新地图状态
         }
 
     }
 
     public void UseSkill(CardData card)//使用技能 
     {
-
+        if (playerState != PlayerState.Stand)
+        {
+            Debug.Log("重复使用卡牌会刷新状态，也会覆盖掉之前的状态");
+        }
         if (card.getCardType == PlayerState.Fly && flyCount > 0)//飞行技能且蓝条量大于0
         {
             playerState = PlayerState.Fly;//设置玩家状态为飞行
@@ -360,5 +362,19 @@ public class GameManager : SingletonMono<GameManager>
         LoadSceneFadeIn();//播放淡入动画
         yield return new WaitForSeconds(0.5f);//等待0.5秒
 
+    }
+
+    public string GetBuffText()
+    {
+        switch (playerState)
+        {
+            case PlayerState.Fly://飞行技能
+                return "可以飞过1个格子";
+            case PlayerState.PassWall://穿墙技能
+                return "可以穿过1个墙格子";
+            case PlayerState.BreakWall://破坏墙技能
+                return "可以破坏1个墙格子";
+        }
+        return "当前没有特殊状态";
     }
 }

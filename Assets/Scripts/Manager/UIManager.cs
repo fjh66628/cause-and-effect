@@ -14,17 +14,20 @@ public class UIManager : MonoBehaviour
     {
         EventHandler.updateCard += SetCardData;
         EventHandler.showDialogue += HaveDialogue;
+        EventHandler.gameOver += GameOver;
     }
     void OnDisable()
     {
         EventHandler.updateCard -= SetCardData;
         EventHandler.showDialogue -= HaveDialogue;
+        EventHandler.gameOver -= GameOver;
     }
     [Header("卡牌")]
     [SerializeField] private GameObject card;//卡牌图片
     [SerializeField] private GameObject dialogueContainer;//对话框
     private Dictionary<string, GameObject> createdCardInstances = new Dictionary<string, GameObject>();
-
+    [SerializeField] private Image overImage;//游戏失败提示
+    [SerializeField] private TextMeshProUGUI overText;//游戏失败提示文本
     void Start()
     {
 
@@ -168,5 +171,12 @@ public class UIManager : MonoBehaviour
         {
             createdCardInstances.Remove(key);
         }
+    }
+
+    void GameOver(string reason)//游戏失败
+    {
+        GameManager.Instance.SetGameState(GameState.Pause);
+        overImage.gameObject.SetActive(true);
+        overText.text = reason;
     }
 }
