@@ -20,6 +20,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     LevelManagement levelManagement;//关卡管理
     [Header("玩家位置")]
     [SerializeField] Vector2Int playerPosition = new Vector2Int(0, 0);//玩家位置
+    public Vector2Int getPlayerPosition => playerPosition;//获取玩家位置
     void OnEnable()
     {
         EventHandler.levelLoaded += UpdateMapInfo;//注册关卡加载事件
@@ -217,7 +218,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         }
         else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.End)
         {
-            ReachTheEnd();
+            ReachTheEnd(position);
         }
         else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall)
         {
@@ -270,8 +271,9 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         Debug.LogWarning("玩家移动到了地图外部");
     }
-    void ReachTheEnd()//玩家到达目标单元格
+    void ReachTheEnd(Vector2Int position)//玩家到达目标单元格
     {
+        PlayerMove(position);
         if (GameManager.Instance.ReachTheEnd() == false)//玩家到达目标单元格
         {
             StartCoroutine(PlayerPositionReset());//玩家重置位置到起始位置
@@ -281,16 +283,13 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
 
     IEnumerator PlayerPositionReset()//踏上轮回之后玩家重置位置到起始位置
     {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(1.2f);
         playerPosition = levelManagement.getPlayerStartPosition;
         FindObjectOfType<PlayerMove>().OnLevelLoaded();//改变玩家在地图中的坐标
     }
 
 
-    void LoadAnimate()//回到起始位置动画
-    {
-        Debug.Log("回到起始位置动画");
-    }
+
 
     void ToTheWall(Vector2Int position)//玩家到达了墙单元格
     {

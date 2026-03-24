@@ -33,27 +33,31 @@ public class UIManager : MonoBehaviour
 
     }
 
-    void HaveDialogue(DialogueSO dialogueData)
+    public void HaveDialogue(DialogueSO dialogueData)
     {
-        DialogueShow();
-        // 显示对话内容
-        EventHandler.onMouseLeftClick += CheckClicked;
+
         TextMeshProUGUI dialogueText = dialogueContainer.GetComponentInChildren<TextMeshProUGUI>();
         StartCoroutine(ShowDialogue(dialogueText, dialogueData));
-        EventHandler.onMouseLeftClick -= CheckClicked;
-        DialogueHide();
     }
 
     IEnumerator ShowDialogue(TextMeshProUGUI dialogueText, DialogueSO dialogueData)
     {
+        GameManager.Instance.SetGameState(GameState.Pause);
+        yield return new WaitForSeconds(0.5f);
+        DialogueShow();
+        // 显示对话内容
+        EventHandler.onMouseClick += CheckClicked;
         foreach (var dialogue in dialogueData.getDialogues)
         {
             // 显示对话内容
             dialogueText.text = dialogue.getDialogue;
             yield return WaitForInput();
         }
+        EventHandler.onMouseClick -= CheckClicked;
+        DialogueHide();
+        GameManager.Instance.SetGameState(GameState.Play);
     }
-    void CheckClicked(Vector2 position)//检查是否点击了对话框
+    void CheckClicked()//检查是否点击了对话框
     {
         isClicked = true;
     }
@@ -66,7 +70,7 @@ public class UIManager : MonoBehaviour
             yield return null;
         }
         isClicked = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
     }
 
     void DialogueShow()

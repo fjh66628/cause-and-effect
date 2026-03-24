@@ -20,5 +20,9 @@ public class InputManager : SingletonMono<InputManager>
             }
         }
         moveDirection = CameraManager.Instance.MainCamera.ScreenToWorldPoint(Input.mousePosition);
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+        {
+            EventHandler.CallMouseClick();//调用鼠标点击事件
+        }
     }
 }

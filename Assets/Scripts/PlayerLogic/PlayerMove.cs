@@ -71,7 +71,7 @@ public class PlayerMove : MonoBehaviour
         Vector2Int LD = new Vector2Int(-1, 0);//获取玩家移动方向
         Vector2Int RU = new Vector2Int(0, -1);//获取玩家移动方向
         Vector2Int input = mapManager.MoveDrection(InputManager.Instance.GetMoveDirection(), transform.position);
-        if (!GameManager.Instance.IsPlayerMoving)//如果玩家不是正在移动
+        if (!GameManager.Instance.IsPlayerMoving && GameManager.Instance.getGameState == GameState.Play)//如果玩家不是正在移动
         {
             if (input == LU)
             {
@@ -102,6 +102,14 @@ public class PlayerMove : MonoBehaviour
                 direction_LU.gameObject.SetActive(false);//设置指示左方向的精灵
                 direction_RD.gameObject.SetActive(false);//设置指示下方向的精灵
             }
+        }
+
+        else if (GameManager.Instance.getGameState == GameState.Pause)
+        {
+            direction_RU.gameObject.SetActive(false);//设置指示上方向的精灵
+            direction_RD.gameObject.SetActive(false);//设置指示下方向的精灵
+            direction_LU.gameObject.SetActive(false);//设置指示左方向的精灵
+            direction_LD.gameObject.SetActive(false);//设置指示右方向的精灵
         }
     }
 }
