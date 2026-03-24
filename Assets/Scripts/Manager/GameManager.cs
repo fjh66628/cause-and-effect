@@ -39,6 +39,23 @@ public class GameManager : SingletonMono<GameManager>
     [SerializeField] private int levelNumber = 1;//关卡编号
     [Header("卡牌数据")]
     [SerializeField] private List<CardData> cardData;//传入卡牌数据
+    bool toWall = false;//是否玩家到达墙单元格
+    bool toWater = false;//是否玩家到达水单元格
+    bool toCollapse = false;//是否玩家到达塌陷处单元格
+    bool toDoor_locked = false;//是否玩家到达门单元格
+    bool toDoor_opened = false;//是否玩家到达门单元格
+    bool toKey = false;//是否玩家到达钥匙单元格
+    bool toDoor_singleuse = false;//是否玩家到达一次性门单元格
+    bool toWall_unbreakable = false;//是否玩家到达不可破坏的墙单元格
+    [SerializeField] private DialogueSO toTheWall;//对话
+    [SerializeField] private DialogueSO toTheWater;//对话
+    [SerializeField] private DialogueSO toTheCollapse;//对话
+    [SerializeField] private DialogueSO toTheDoor_locked;//对话
+    [SerializeField] private DialogueSO toTheDoor_opened;//对话
+    [SerializeField] private DialogueSO toTheKey;//对话
+    [SerializeField] private DialogueSO toTheDoor_singleuse;//对话
+    [SerializeField] private DialogueSO toTheWall_unbreakable;//对话
+
 
     public int getChapterNumber => ChapterNumber;//获取章节编号
     public int getLevelNumber => levelNumber;//获取关卡编号
@@ -376,5 +393,74 @@ public class GameManager : SingletonMono<GameManager>
                 return "可以破坏1个墙格子";
         }
         return "当前没有特殊状态";
+    }
+
+    public void SetLevelCount(int Chapter, int Level)
+    {
+        ChapterNumber = Chapter;
+        levelNumber = Level;
+    }
+
+    public void GiveTips(MapCellContent mapCellContent)
+    {
+        switch (mapCellContent)
+        {
+            case MapCellContent.Wall:
+                if (!toWall)
+                {
+                    toWall = true;
+                    EventHandler.showDialogue(toTheWall);
+                }
+                break;
+            case MapCellContent.Water:
+                if (!toWater)
+                {
+                    toWater = true;
+                    EventHandler.showDialogue(toTheWater);
+                }
+                break;
+            case MapCellContent.Collapse:
+                if (!toCollapse)
+                {
+                    toCollapse = true;
+                    EventHandler.showDialogue(toTheCollapse);
+                }
+                break;
+            case MapCellContent.Wall_unbreakable:
+                if (!toWall_unbreakable)
+                {
+                    toWall_unbreakable = true;
+                    EventHandler.showDialogue(toTheWall_unbreakable);
+                }
+                break;
+            case MapCellContent.Door_locked:
+                if (!toDoor_locked)
+                {
+                    toDoor_locked = true;
+                    EventHandler.showDialogue(toTheDoor_locked);
+                }
+                break;
+            case MapCellContent.Door_opened:
+                if (!toDoor_opened)
+                {
+                    toDoor_opened = true;
+                    EventHandler.showDialogue(toTheDoor_opened);
+                }
+                break;
+            case MapCellContent.Key:
+                if (!toKey)
+                {
+                    toKey = true;
+                    EventHandler.showDialogue(toTheKey);
+                }
+                break;
+            case MapCellContent.Door_singleuse:
+                if (!toDoor_singleuse)
+                {
+                    toDoor_singleuse = true;
+                    EventHandler.showDialogue(toTheDoor_singleuse);
+                }
+                break;
+        }
     }
 }

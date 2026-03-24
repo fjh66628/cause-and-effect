@@ -59,3 +59,11 @@ MonoBehaviour:
   ChapterNumber: 1
   levelNumber: 1
   cardData: []
+  toTheWall: {fileID: 11400000, guid: f8f2a1d9f15b4794fa3d3d390ad0e540, type: 2}
+  toTheWater: {fileID: 11400000, guid: 874c1737da134894f8195bf3c6e2f0ab, type: 2}
+  toTheCollapse: {fileID: 11400000, guid: d25448f448f2a2b41ae53b5b5c3bbfd3, type: 2}
+  toTheDoor_locked: {fileID: 11400000, guid: b015138fc10f79842aa1b781e5aef534, type: 2}
+  toTheDoor_opened: {fileID: 11400000, guid: f1f77204fa7196f4db88309bb15610f3, type: 2}
+  toTheKey: {fileID: 11400000, guid: 4453f98994f2da74298f1da9a6595ff3, type: 2}
+  toTheDoor_singleuse: {fileID: 11400000, guid: 75ac1a2a16128d04399e2112609bae57, type: 2}
+  toTheWall_unbreakable: {fileID: 11400000, guid: 88194ca9874cbeb4db11d84de2a70a43, type: 2}

@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPosition: {x: 0, y: 0}
+  leaveTheMap: {fileID: 11400000, guid: fbd3f0feb7dc03043bd610fe0afc0af4, type: 2}
