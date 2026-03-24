@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardList:
   - cardType: 1
-    cardSprite: {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
-    cardDescription: "\u98DE"
-    cardName: "\u98DE\u98DE"
-  - cardType: 3
-    cardSprite: {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
-    cardDescription: "\u7A7F"
-    cardName: "\u7A7F\u7A7F"
+    cardSprite: {fileID: 1786484356165276593, guid: f82d5da28f4b6ee4484e9b8266773e54, type: 3}
+    cardDescription: "\u4F7F\u7528\u540E\u53EF\u901A\u8FC7\u4E00\u4E2A\u6C34\u683C\u5B50\u6216\u8005\u584C\u9677\u683C\u5B50"
+    cardName: "\u98DE\u884C"
   - cardType: 2
-    cardSprite: {fileID: 21300000, guid: 255b042074f54054db3f4e6329056cbe, type: 3}
-    cardDescription: "\u6253\u98DE"
-    cardName: "\u6253"
+    cardSprite: {fileID: 6917426151405818007, guid: f82d5da28f4b6ee4484e9b8266773e54, type: 3}
+    cardDescription: "\u4F7F\u7528\u540E\u53EF\u7A7F\u8FC7\u4E00\u4E2A\u5899\u5355\u5143"
+    cardName: "\u7834\u5899"
+  - cardType: 3
+    cardSprite: {fileID: -8114925589947862754, guid: f82d5da28f4b6ee4484e9b8266773e54, type: 3}
+    cardDescription: "\u4F7F\u7528\u540E\u53EF\u4EE5\u6253\u7834\u4E00\u4E2A\u666E\u901A\u7684\u5899"
+    cardName: "\u7A7F\u5899"

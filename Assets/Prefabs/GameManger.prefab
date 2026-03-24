@@ -44,4 +44,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70faa79fe1e48024c8c4b2bd5c5ce761, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameState: 0
+  gameState: 1
+  playerState: 0
+  isPlayerMoving: 0
+  endStepCount: 1
+  flyCount: 1
+  passWallCount: 1
+  breakWallCount: 1
+  maxPassWallCount: 1
+  maxBreakWallCount: 1
+  maxFlyCount: 1
+  passWallCell: 1
+  flyCell: 1
+  ChapterNumber: 1
+  levelNumber: 1
+  cardData: []

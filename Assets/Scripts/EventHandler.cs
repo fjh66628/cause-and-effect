@@ -16,7 +16,8 @@ public static class EventHandler
     public static Action playerMove;//改变玩家位置事件
     public static Action playerStand;//玩家退出特殊状态事件
     public static Action<DialogueSO> showDialogue;//显示对话框事件
-
+    public static Action<string> gameOver;//游戏失败事件
+    public static Action onMouseClick;//鼠标点击事件
 
 
     public static void CallMouseLeftClick(Vector2 position)//调用鼠标点击左键事件
@@ -64,5 +65,12 @@ public static class EventHandler
     {
         showDialogue?.Invoke(dialogueData);
     }
-
+    public static void CallGameOver(string reason)//调用游戏失败事件
+    {
+        gameOver?.Invoke(reason);
+    }
+    public static void CallMouseClick()//调用鼠标点击事件
+    {
+        onMouseClick?.Invoke();
+    }
 }

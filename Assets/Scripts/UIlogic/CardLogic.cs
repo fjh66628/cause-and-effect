@@ -102,45 +102,88 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// <summary>
     /// 开始拖拽 - 修复版本
     /// </summary>
+
+    /// <summary>
+    /// 开始拖拽 - 修复版本
+    /// </summary>
     void StartDrag(PointerEventData eventData)
+
     {
+
         isDragging = true;
 
+
+
         // 记录原始位置
+
         originalPosition = rectTransform.anchoredPosition;
 
+
+
         // 更精确的偏移计算
+
         if (parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
+
         {
+
             // Overlay模式：直接使用屏幕坐标计算偏移
+
             offset = rectTransform.position - (Vector3)eventData.position;
+
         }
+
         else
+
         {
+
             // Camera模式：使用局部坐标计算偏移
+
             Vector2 localPoint;
+
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+
                 rectTransform, eventData.position, eventData.pressEventCamera, out localPoint))
+
             {
+
                 offset = rectTransform.anchoredPosition - localPoint;
+
             }
+
             else
+
             {
+
                 // 备用方案：使用屏幕坐标
+
                 offset = rectTransform.position - (Vector3)eventData.position;
+
             }
+
         }
+
+
 
         // 切换到拖拽父级，避免受GridLayout影响
+
         if (dragParent != null)
+
         {
+
             transform.SetParent(dragParent);
+
         }
 
+
+
         // 设置到最上层
+
         transform.SetAsLastSibling();
 
+
+
     }
+
     /// <summary>
     /// 鼠标悬停时调用的方法
     /// </summary>
@@ -257,31 +300,15 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // 回到原始父级
         transform.SetParent(originalParent);
 
-        // 平滑回到原始位置
-        StartCoroutine(SmoothReturnToGrid());
+        // 回到原始位置
+        SmoothReturnToGrid();
     }
 
     /// <summary>
     /// 平滑回到GridLayout中的位置
     /// </summary>
-    IEnumerator SmoothReturnToGrid()
+    void SmoothReturnToGrid()
     {
-        Vector3 startPos = rectTransform.anchoredPosition;
-        float duration = 0.3f; // 返回动画时长
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float progress = elapsed / duration;
-
-            // 使用缓动函数使动画更平滑
-            rectTransform.anchoredPosition = Vector3.Lerp(startPos, originalPosition, progress);
-
-            yield return null;
-        }
-
-        // 确保最终位置准确
         rectTransform.anchoredPosition = originalPosition;
 
         // 强制刷新GridLayout（确保正确排列）

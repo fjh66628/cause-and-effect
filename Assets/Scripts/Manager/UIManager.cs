@@ -14,43 +14,50 @@ public class UIManager : MonoBehaviour
     {
         EventHandler.updateCard += SetCardData;
         EventHandler.showDialogue += HaveDialogue;
+        EventHandler.gameOver += GameOver;
     }
     void OnDisable()
     {
         EventHandler.updateCard -= SetCardData;
         EventHandler.showDialogue -= HaveDialogue;
+        EventHandler.gameOver -= GameOver;
     }
     [Header("卡牌")]
     [SerializeField] private GameObject card;//卡牌图片
     [SerializeField] private GameObject dialogueContainer;//对话框
     private Dictionary<string, GameObject> createdCardInstances = new Dictionary<string, GameObject>();
-
+    [SerializeField] private Image overImage;//游戏失败提示
+    [SerializeField] private TextMeshProUGUI overText;//游戏失败提示文本
     void Start()
     {
 
     }
 
-    void HaveDialogue(DialogueSO dialogueData)
+    public void HaveDialogue(DialogueSO dialogueData)
     {
-        DialogueShow();
-        // 显示对话内容
-        EventHandler.onMouseLeftClick += CheckClicked;
+
         TextMeshProUGUI dialogueText = dialogueContainer.GetComponentInChildren<TextMeshProUGUI>();
         StartCoroutine(ShowDialogue(dialogueText, dialogueData));
-        EventHandler.onMouseLeftClick -= CheckClicked;
-        DialogueHide();
     }
 
     IEnumerator ShowDialogue(TextMeshProUGUI dialogueText, DialogueSO dialogueData)
     {
+        GameManager.Instance.SetGameState(GameState.Pause);
+        yield return new WaitForSeconds(0.5f);
+        DialogueShow();
+        // 显示对话内容
+        EventHandler.onMouseClick += CheckClicked;
         foreach (var dialogue in dialogueData.getDialogues)
         {
             // 显示对话内容
             dialogueText.text = dialogue.getDialogue;
             yield return WaitForInput();
         }
+        EventHandler.onMouseClick -= CheckClicked;
+        DialogueHide();
+        GameManager.Instance.SetGameState(GameState.Play);
     }
-    void CheckClicked(Vector2 position)//检查是否点击了对话框
+    void CheckClicked()//检查是否点击了对话框
     {
         isClicked = true;
     }
@@ -63,7 +70,7 @@ public class UIManager : MonoBehaviour
             yield return null;
         }
         isClicked = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
     }
 
     void DialogueShow()
@@ -168,5 +175,12 @@ public class UIManager : MonoBehaviour
         {
             createdCardInstances.Remove(key);
         }
+    }
+
+    void GameOver(string reason)//游戏失败
+    {
+        GameManager.Instance.SetGameState(GameState.Pause);
+        overImage.gameObject.SetActive(true);
+        overText.text = reason;
     }
 }

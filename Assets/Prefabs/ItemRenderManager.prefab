@@ -60,6 +60,8 @@ MonoBehaviour:
   - mapCellContent: 7
     itemPrefab: {fileID: 3544004762787626780, guid: a5650ec84cfd80b4794dd450fc7b9716, type: 3}
   - mapCellContent: 8
-    itemPrefab: {fileID: 3544004762787626780, guid: a5650ec84cfd80b4794dd450fc7b9716, type: 3}
+    itemPrefab: {fileID: 4583197159053586700, guid: a5ded5d660e9c7b4aac6aa5e3448b5de, type: 3}
   - mapCellContent: 9
     itemPrefab: {fileID: 3544004762787626780, guid: a5650ec84cfd80b4794dd450fc7b9716, type: 3}
+  - mapCellContent: 10
+    itemPrefab: {fileID: 2490729412568704484, guid: c40cf12f0af2adc4b8979dfe734e0826, type: 3}

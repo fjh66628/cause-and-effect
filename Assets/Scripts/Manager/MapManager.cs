@@ -20,6 +20,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     LevelManagement levelManagement;//关卡管理
     [Header("玩家位置")]
     [SerializeField] Vector2Int playerPosition = new Vector2Int(0, 0);//玩家位置
+    public Vector2Int getPlayerPosition => playerPosition;//获取玩家位置
     void OnEnable()
     {
         EventHandler.levelLoaded += UpdateMapInfo;//注册关卡加载事件
@@ -217,7 +218,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         }
         else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.End)
         {
-            ReachTheEnd();
+            ReachTheEnd(position);
         }
         else if (mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getCellContent == MapCellContent.Wall)
         {
@@ -262,6 +263,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         MapCell playerCell = mapGrid[playerPosition.x, playerPosition.y];
         playerPosition = position + playerPosition;//将玩家移动到新的单元格 
+        EventHandler.CallPlayerMove();
     }
 
 
@@ -269,14 +271,25 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         Debug.LogWarning("玩家移动到了地图外部");
     }
-    void ReachTheEnd()//玩家到达目标单元格
+    void ReachTheEnd(Vector2Int position)//玩家到达目标单元格
     {
+        PlayerMove(position);
         if (GameManager.Instance.ReachTheEnd() == false)//玩家到达目标单元格
         {
-            playerPosition = levelManagement.getPlayerStartPosition;
+            StartCoroutine(PlayerPositionReset());//玩家重置位置到起始位置
         }
         Debug.Log("玩家到达了目标单元格");
     }
+
+    IEnumerator PlayerPositionReset()//踏上轮回之后玩家重置位置到起始位置
+    {
+        yield return new WaitForSeconds(1.2f);
+        playerPosition = levelManagement.getPlayerStartPosition;
+        FindObjectOfType<PlayerMove>().OnLevelLoaded();//改变玩家在地图中的坐标
+    }
+
+
+
 
     void ToTheWall(Vector2Int position)//玩家到达了墙单元格
     {
@@ -345,7 +358,6 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     {
         ChangeTheDoorState(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getId);//改变门单元格的状态
         PlayerMove(position);//玩家移动到新的单元格
-        Debug.LogWarning("玩家到达了钥匙单元格");
     }
     void ToTheDoorClosed()//玩家到达了关闭的门单元格
     {
@@ -390,29 +402,28 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             }
         }
     }
-    void CheckPlayerPosition()//判断玩家在哪个位置
+    public void CheckPlayerPosition()//判断玩家在哪个位置
     {
         if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Collapse)//如果玩家在塌陷单元格
         {
-            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
-            Debug.LogWarning("玩家在塌陷单元格");
+            GameOver("完蛋，你掉下去了");
         }
         else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Water)//如果玩家在水单元格
         {
-            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
-            Debug.LogWarning("玩家在水单元格");
+            GameOver("你被水包围了");
         }
         else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Wall)//如果玩家在墙单元格
         {
-            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
-            Debug.LogWarning("玩家在墙单元格");
+            GameOver("你准备在墙里边游泳");
         }
         else if (mapGrid[playerPosition.x, playerPosition.y].getCellContent == MapCellContent.Wall_unbreakable)//如果玩家在钥匙单元格
         {
-            GameManager.Instance.ReloadCurrentLevel();//重新加载当前关卡
-            Debug.LogWarning("玩家在不可破坏的墙单元格");
+            GameOver("你卡在了坚固的墙里边");
         }
 
     }
-
+    void GameOver(string reason)//游戏失败
+    {
+        EventHandler.CallGameOver(reason);//调用游戏失败事件
+    }
 }
