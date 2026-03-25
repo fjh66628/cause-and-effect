@@ -11,7 +11,7 @@ public class NpcLogic : MonoBehaviour
     [SerializeField] int count = 1;//第几周目会话
     void FixedUpdate()
     {
-        Vector2Int playerPosition = FindObjectOfType<MapManager>().getPlayerPosition;
+        Vector2Int playerPosition = new Vector2Int(FindObjectOfType<MapManager>().getPlayerPosition.y, FindObjectOfType<MapManager>().getPlayerPosition.x);
         if (playerPosition == talkPosition && !isTalked && GameManager.Instance.getEndStepCount == count)
         {
             isTalked = true;

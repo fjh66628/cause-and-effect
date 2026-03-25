@@ -248,6 +248,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: LevelManager
       objectReference: {fileID: 0}
+    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[1].position.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[2].position.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[1].mapCellContent
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+      propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.data[2].mapCellContent
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 8826636172788943640, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

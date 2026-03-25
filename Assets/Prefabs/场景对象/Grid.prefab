@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4308827237956912703}
   - component: {fileID: 4633266542111050711}
   - component: {fileID: 7174483816210158519}
+  - component: {fileID: 1074240508699444714}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -58,6 +59,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0901de864d688a4b81dd2d7cade5a70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!210 &1074240508699444714
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 598856287479191398}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: -1
+  m_SortAtRoot: 0
 --- !u!1 &7695964860605662265
 GameObject:
   m_ObjectHideFlags: 0

@@ -154,6 +154,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4984625695806591051}
   - component: {fileID: 8977465357359699892}
+  - component: {fileID: 5013694889048682837}
   m_Layer: 0
   m_Name: Grid_for_Rectangle
   m_TagString: Untagged
@@ -189,3 +190,15 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!210 &5013694889048682837
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8427674340932660000}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: -2
+  m_SortAtRoot: 0
