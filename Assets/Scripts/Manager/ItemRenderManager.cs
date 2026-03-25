@@ -104,6 +104,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
                 SetItemDefaultColor(item, mapManager.getMapGrid[position.x, position.y].getId);
                 string itemID = GetItemID(mapCellContent, position);
                 itemDatas.Add(itemID, new ItemData(itemID, item));
+
             }
             else
             {
@@ -135,8 +136,6 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             itemDatas.Remove(itemId);
             return true;
         }
-
-        Debug.LogWarning($"未找到物品ID: {itemId}");
         return false;
     }
 
@@ -189,7 +188,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         }
         else
         {
-            Debug.LogWarning($"在位置 {position} 未找到物品对象");
+            Debug.LogWarning($"在位置 {position} 未找到物品对象{itemId}");
         }
     }
     void ChangeItemState(Vector2Int position, MapCellContent fromState)
@@ -209,10 +208,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             toState = MapCellContent.Collapse;
         }
         // 1. 卸载旧物品
-        if (UnloadItemById(fromId))
-        {
-            Debug.Log($"成功卸载 {fromState} 物品");
-        }
+        UnloadItemById(fromId);
         GameObject targetSceneRoot = GameObject.Find($"ChapterRoot"); // 找到目标场景的根节点
         // 2. 创建新物品    
         prefabMapping newItemPrefab = itemPrefabs.Find(x => x.getMapCellContent == toState);

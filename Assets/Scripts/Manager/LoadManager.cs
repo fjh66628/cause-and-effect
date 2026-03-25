@@ -15,7 +15,7 @@ public class LoadManager : SingletonMono<LoadManager>
     }
     IEnumerator LoadLevelManagerCoroutine()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.2f);
         SceneManager.LoadScene("LevelManager");
     }
     public void LoadLevel(int Chapter, int Level)
@@ -25,7 +25,7 @@ public class LoadManager : SingletonMono<LoadManager>
     IEnumerator LoadLevelCoroutine(string sceneName, string targetName)
     {
         LoadingAnimator.Instance.SetLoading(targetName);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.2f);
         yield return SceneManager.LoadSceneAsync("UI");
         yield return SceneManager.LoadSceneAsync(targetName, LoadSceneMode.Additive);
         EventHandler.CallLevelLoaded();
@@ -35,7 +35,7 @@ public class LoadManager : SingletonMono<LoadManager>
     {
         string targetName = $"Chapter{Chapter}Floor{Level}";
         LoadingAnimator.Instance.SetLoading(targetName);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1.2f);
         yield return SceneManager.LoadSceneAsync("UI");
         GameManager.Instance.SetLevelCount(Chapter, Level);
         yield return SceneManager.LoadSceneAsync(targetName, LoadSceneMode.Additive);

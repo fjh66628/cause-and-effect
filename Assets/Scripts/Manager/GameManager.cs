@@ -284,12 +284,12 @@ public class GameManager : SingletonMono<GameManager>
     /// </summary>
     public void ReloadCurrentLevel()
     {
+        LoadingAnimator.Instance.SetLoading("重新加载关卡");//显示加载动画
         StartCoroutine(ReloadCurrentLevelCoroutine());
     }
 
     IEnumerator ReloadCurrentLevelCoroutine()
     {
-        Debug.Log($"重新加载关卡: Chapter{ChapterNumber}Floor{levelNumber}");
 
         // 1. 暂停游戏
         gameState = GameState.Pause;

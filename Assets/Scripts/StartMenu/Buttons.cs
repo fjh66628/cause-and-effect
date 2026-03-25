@@ -20,7 +20,7 @@ public class Buttons : MonoBehaviour
     public void LoadGame()
     {
         LoadManager.Instance.LoadLevelManager();
-        LoadingAnimator.Instance.SetLoading("LevelManager");
+        LoadingAnimator.Instance.SetLoading("选择场景");
     }
 
 }

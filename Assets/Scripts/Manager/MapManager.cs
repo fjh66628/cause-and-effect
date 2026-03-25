@@ -318,7 +318,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         if (GameManager.Instance.getPlayerState != PlayerState.Fly)//如果玩家可以破坏墙单元格
         {
             mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Collapse);//将一次性门单元格设置为塌陷单元格
-            EventHandler.CallChangeItem(MapCellContent.Collapse, playerPosition);//调用改变物品事件
+            EventHandler.CallChangeItem(MapCellContent.Door_singleuse, playerPosition);//调用改变物品事件
             GameManager.Instance.GiveTips(MapCellContent.Door_singleuse);//调用玩家到达一次性门单元格事件提示
         }
     }
