@@ -4527,6 +4527,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 983196750836602364, guid: e9bae987f825be24e9fedd3e6611e4ab, type: 3}
+      propertyPath: count
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 983196750836602364, guid: e9bae987f825be24e9fedd3e6611e4ab, type: 3}
       propertyPath: talkPosition.x
       value: 0
       objectReference: {fileID: 0}

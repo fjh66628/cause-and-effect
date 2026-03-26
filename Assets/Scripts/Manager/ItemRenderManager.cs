@@ -31,6 +31,8 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
 
     [Header("物品预制体")]
     [SerializeField] private List<prefabMapping> itemPrefabs;//物品预制体列表
+    [Header("爆炸效果")]
+    [SerializeField] private GameObject explodePrefab;//爆炸效果预制体
 
     Dictionary<string, ItemData> itemDatas = new Dictionary<string, ItemData>();//物品数据字典
     MapManager mapManager;
@@ -38,13 +40,13 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
     {
         EventHandler.changeItem += ChangeItem;//注销改变物品事件
         EventHandler.levelLoaded += LoadAllItems;
-        EventHandler.passTheWall += PassTheWall;//注销玩家穿墙单元格事件
+
     }
     void OnDisable()
     {
         EventHandler.changeItem -= ChangeItem;//注销改变物品事件
         EventHandler.levelLoaded -= LoadAllItems;
-        EventHandler.passTheWall -= PassTheWall;//注销玩家穿墙单元格事件
+
     }
 
     void LoadAllItems()
@@ -70,19 +72,6 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             }
         }
         //加载所有物品
-    }
-    void PassTheWall(Vector2Int position)//玩家穿墙单元格事件
-    {
-        if (itemDatas.TryGetValue(GetItemID(MapCellContent.Wall, position), out ItemData itemData))
-        {
-            Color color = itemData.getItemObject.GetComponent<SpriteRenderer>().color;
-            itemData.getItemObject.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.5f);
-        }
-        if (itemDatas.TryGetValue(GetItemID(MapCellContent.Wall_unbreakable, position), out itemData))
-        {
-            Color color = itemData.getItemObject.GetComponent<SpriteRenderer>().color;
-            itemData.getItemObject.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.5f);
-        }
     }
     void CreatItem(MapCellContent mapCellContent)//根据物品种类创建物品
     {

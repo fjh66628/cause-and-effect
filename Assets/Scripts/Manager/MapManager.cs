@@ -299,6 +299,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         {
             EventHandler.CallBreakTheWall();//调用玩家破坏墙单元格事件
             StartCoroutine(BreakTheWallAnimation(position));//玩家破坏墙单元格动画
+            GameManager.Instance.ChangePlayerState(PlayerState.Stand);//调用玩家到达墙单元格事件提示
         }
         else if (GameManager.Instance.getPlayerState == PlayerState.PassWall)//如果玩家可以穿墙单元格
         {

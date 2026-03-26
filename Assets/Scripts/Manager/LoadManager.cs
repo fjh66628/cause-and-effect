@@ -40,5 +40,6 @@ public class LoadManager : SingletonMono<LoadManager>
         GameManager.Instance.SetLevelCount(Chapter, Level);
         yield return SceneManager.LoadSceneAsync(targetName, LoadSceneMode.Additive);
         EventHandler.CallLevelLoaded();
+        EventHandler.CallUpdateCard();
     }
 }

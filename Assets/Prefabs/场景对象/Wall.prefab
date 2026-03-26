@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6041881623526457201}
   - component: {fileID: -1656188163606152621}
+  - component: {fileID: 6286858014641355068}
   m_Layer: 0
   m_Name: Wall
   m_TagString: Untagged
@@ -45,6 +46,18 @@ SortingGroup:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_SortAtRoot: 1
+--- !u!114 &6286858014641355068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3544004762787626780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b93e08ea71039ea48b5394ac6748b64b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6984624867690958484
 GameObject:
   m_ObjectHideFlags: 0

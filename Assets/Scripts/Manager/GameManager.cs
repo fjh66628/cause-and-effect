@@ -21,7 +21,7 @@ public class GameManager : SingletonMono<GameManager>
     [SerializeField] private int maxFlyCount = 1;//飞行最大蓝条量
     [SerializeField] private int passWallCell = 1;//穿墙可以穿过几个墙单元格
     [SerializeField] private int flyCell = 1;//飞行可以飞行几个墙单元格
-
+    [SerializeField] private DialogueSO cardTips;//卡牌提示对话框(在非站立状态下显示)
     public int getEndStepCount => endStepCount;//获取走过了几次终点
     public bool IsPlayerMoving => isPlayerMoving;//是否玩家正在移动
     public void SetIsPlayerMoving(bool isMoving)//设置玩家是否正在移动
@@ -136,7 +136,7 @@ public class GameManager : SingletonMono<GameManager>
     IEnumerator LoadNextLevel(string currentSceneName, string nextSceneName)//加载下一关
     {
         gameState = GameState.Pause;//游戏状态重置为暂停
-        LoadSceneFadeOut();//加载场景淡出动画;
+
         yield return new WaitForSeconds(0.5f);//等待0.5秒
 
         yield return SceneManager.UnloadSceneAsync(currentSceneName);
@@ -149,7 +149,7 @@ public class GameManager : SingletonMono<GameManager>
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(nextSceneName));//设置下一关场景为活动场景
         endStepCount = 1;//重置走过了几次终点
         EventHandler.CallLevelLoaded();//调用关卡加载事件
-        LoadSceneFadeIn();//加载场景淡入动画
+
 
         SetCardNumber();//设置卡牌蓝数目
 
@@ -189,14 +189,6 @@ public class GameManager : SingletonMono<GameManager>
         return cardData;//返回传入卡牌数据
     }
 
-    void LoadSceneFadeOut()//加载场景动画
-    {
-        Debug.Log("淡出场景动画");
-    }
-    void LoadSceneFadeIn()//加载场景动画
-    {
-        Debug.Log("淡入场景动画");
-    }
 
     public void OnPlayerMove()//玩家移动
     {
@@ -231,8 +223,9 @@ public class GameManager : SingletonMono<GameManager>
     {
         if (playerState != PlayerState.Stand)
         {
-            Debug.Log("重复使用卡牌会刷新状态，也会覆盖掉之前的状态");
+            FindObjectOfType<UIManager>().HaveDialogue(cardTips);//调用显示对话框事件
         }
+        EventHandler.CallPlayerStateChange(card.getCardType);//调用更新玩家状态事件
         if (card.getCardType == PlayerState.Fly && flyCount > 0)//飞行技能且蓝条量大于0
         {
             playerState = PlayerState.Fly;//设置玩家状态为飞行
@@ -270,14 +263,6 @@ public class GameManager : SingletonMono<GameManager>
         // 查找并移除卡牌
         int removedCount = cardData.RemoveAll(card => card == cardToRemove);
 
-        if (removedCount > 0)
-        {
-            Debug.Log($"成功移除卡牌: {cardToRemove.getCardName}，移除数量: {removedCount}");
-        }
-        else
-        {
-            Debug.LogWarning($"未找到要移除的卡牌: {cardToRemove.getCardName}");
-        }
     }
     /// <summary>
     /// 重新加载当前关卡（重置游戏状态但保持同一关卡）
@@ -294,8 +279,6 @@ public class GameManager : SingletonMono<GameManager>
         // 1. 暂停游戏
         gameState = GameState.Pause;
 
-        // 2. 播放淡出动画
-        LoadSceneFadeOut();
         yield return new WaitForSeconds(0.5f);
 
         // 3. 卸载当前场景
@@ -313,7 +296,7 @@ public class GameManager : SingletonMono<GameManager>
         // 6. 重置游戏状态
         ResetGameStateForReload();
         // 7. 播放淡入动画并恢复游戏
-        LoadSceneFadeIn();
+
         gameState = GameState.Play;
 
         Debug.Log("关卡重新加载完成");
@@ -342,7 +325,6 @@ public class GameManager : SingletonMono<GameManager>
         // 触发关卡加载事件
         EventHandler.CallLevelLoaded();
         EventHandler.CallUpdateCard();//调用更新卡牌数据事件
-        Debug.Log("游戏状态已重置");
     }
 
     public int GetCardUseData(string cardName)//获取卡牌使用次数
@@ -369,14 +351,13 @@ public class GameManager : SingletonMono<GameManager>
     {
         gameState = GameState.Pause;//游戏状态重置为暂停
 
-        // 播放淡出动画
-        LoadSceneFadeOut();
+
         yield return new WaitForSeconds(0.5f);//等待0.5秒
 
 
         // 加载结束场景（单场景模式）
         yield return SceneManager.LoadSceneAsync("END", LoadSceneMode.Single);
-        LoadSceneFadeIn();//播放淡入动画
+
         yield return new WaitForSeconds(0.5f);//等待0.5秒
 
     }

@@ -14,4 +14,9 @@ public class PauseButton : MonoBehaviour
         GameManager.Instance.ReloadCurrentLevel();
         pause.PauseGame();//暂停游戏
     }
+    public void RestartGameButton()//重新开始游戏按钮
+    {
+        GameManager.Instance.ReloadCurrentLevel();
+        pause.GameOver();//暂停游戏
+    }
 }

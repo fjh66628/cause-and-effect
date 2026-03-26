@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Unity.VisualScripting;
 using UnityEngine;
 [System.Serializable]
@@ -17,11 +18,15 @@ public class PlayerMove : MonoBehaviour
     {
         EventHandler.onMouseLeftClick += OnMouseLeftClick;//订阅鼠标点击左键事件
         EventHandler.mapLoaded += OnLevelLoaded;//订阅关卡加载事件
+        EventHandler.playerStateChange += playerStateChange;//订阅玩家状态改变事件
+        EventHandler.playerStand += PlayerStand;//订阅玩家站立事件
     }
     private void OnDisable()
     {
         EventHandler.onMouseLeftClick -= OnMouseLeftClick;//取消订阅鼠标点击左键事件
         EventHandler.mapLoaded -= OnLevelLoaded;//取消订阅关卡加载事件
+        EventHandler.playerStateChange -= playerStateChange;//取消订阅玩家状态改变事件
+        EventHandler.playerStand -= PlayerStand;//取消订阅玩家站立事件
     }
 
     public void OnLevelLoaded()
@@ -29,7 +34,6 @@ public class PlayerMove : MonoBehaviour
         mapManager = FindObjectOfType<MapManager>();//获取地图管理器组件
         if (mapManager == null)
         {
-            Debug.LogError("地图管理器组件不存在");
             return;
         }
         StartCoroutine(ChangePosition(mapManager.GetPlayerWorldPosition()));//初始化玩家在世界坐标中的位置
@@ -111,5 +115,18 @@ public class PlayerMove : MonoBehaviour
             direction_LU.gameObject.SetActive(false);//设置指示左方向的精灵
             direction_LD.gameObject.SetActive(false);//设置指示右方向的精灵
         }
+    }
+
+    void playerStateChange(PlayerState state)//玩家状态改变事件
+    {
+        switch (state)
+        {
+            case PlayerState.Fly:
+                break;
+        }
+    }
+    void PlayerStand()//玩家站立事件
+    {
+
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Pause : MonoBehaviour
 {
     [SerializeField] private Image pauseImage;//暂停图片
-
+    [SerializeField] private Image resume;//继续按钮
     public void PauseGame()
     {
         if (GameManager.Instance.getGameState != GameState.Pause)
@@ -20,5 +20,9 @@ public class Pause : MonoBehaviour
             pauseImage.gameObject.SetActive(false);
         }
     }
-
+    public void GameOver()
+    {
+        GameManager.Instance.SetGameState(GameState.Pause);
+        resume.gameObject.SetActive(false);
+    }
 }

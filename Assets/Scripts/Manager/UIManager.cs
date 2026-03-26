@@ -165,7 +165,6 @@ public class UIManager : MonoBehaviour
                 if (instance != null)
                 {
                     Destroy(instance);
-                    Debug.Log($"清理孤立的卡牌实例: {cardId}");
                 }
             }
         }
