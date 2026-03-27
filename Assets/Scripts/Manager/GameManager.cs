@@ -85,7 +85,7 @@ public class GameManager : SingletonMono<GameManager>
     public void SetCardData()//设置传入卡牌数据
     {
         List<CardData> removeCardList = new List<CardData>();//移除卡片列表
-        this.cardData = LevelManager.Instance.GetCardData(ChapterNumber, levelNumber, endStepCount);//传入卡牌数据赋值
+        cardData = LevelManager.Instance.GetCardData(ChapterNumber, levelNumber, endStepCount);//传入卡牌数据赋值
         foreach (CardData card in cardData)//遍历卡牌数据
         {
             if (card.getCardType == PlayerState.Fly && flyCount <= 0 || card.getCardType == PlayerState.PassWall && passWallCount <= 0 || card.getCardType == PlayerState.BreakWall && breakWallCount <= 0)//如果飞行蓝条量小于等于0或穿墙蓝条量小于等于0或破坏墙蓝条量小于等于0

@@ -85,7 +85,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         GameObject targetSceneRoot = GameObject.Find($"ChapterRoot"); // 找到目标场景的根节点
         foreach (Vector2Int position in itemsPositions)
         {
-            if (mapManager.getMapGrid[position.x, position.y].getId == "0" || mapManager.getMapGrid[position.x, position.y].getId == "")
+            if (mapManager.getMapGrid[position.x, position.y].getId == "" || mapManager.getMapGrid[position.x, position.y].getId != "")
             {
 
                 GameObject item = Instantiate(prefabMapping.getItemPrefab, mapManager.GetWorldPosition(position), Quaternion.identity);
@@ -143,7 +143,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         float r = int.Parse(itemID[0].ToString());
         float g = int.Parse(itemID[1].ToString());
         float b = int.Parse(itemID[2].ToString());
-        return new Color((155f + r * 10) / 255f, (155f + g * 10) / 255f, (155f + g * 10f) / 255f);
+        return new Color((155f + r * 50) / 255f, (155f + g * 50) / 255f, (155f + b * 50) / 255f);
     }
     void SetItemColor(GameObject item, Color color)//设置物品颜色
     {
