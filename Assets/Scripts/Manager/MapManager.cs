@@ -87,7 +87,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             MapCellContent content = levelManagement.getUnitPositions[x].getMapCellContent;
 
             // 确保坐标在数组范围内
-            if (pos.x >= 0 && pos.x < 12 && pos.y >= 0 && pos.y < 12)
+            if (pos.x >= 0 && pos.x < mapGrid.GetLength(0) && pos.y >= 0 && pos.y < mapGrid.GetLength(1))
             {
                 mapGrid[pos.x, pos.y].setCellContent(content);
                 mapGrid[pos.x, pos.y].SetId(levelManagement.getUnitPositions[x].getId);

@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8911c4ef0e63d344c94d5b5501f19713, type: 3}
   m_Name: "\u8986\u76D6\u5361\u724C\u6548\u679C\u63D0\u793A"
   m_EditorClassIdentifier: 
-  dialogues: []
+  dialogues:
+  - dialogue: "\u91CD\u590D\u4F7F\u7528\u5361\u724C\u4F1A\u8986\u76D6\u4E4B\u524D\u7684\u72B6\u6001\u54E6"
+  - dialogue: "\u6BCF\u4E2A\u5361\u724C\u53EA\u80FD\u4F9B\u4F60\u884C\u52A8\u4E00\u4E2A\u683C\u5B50"
