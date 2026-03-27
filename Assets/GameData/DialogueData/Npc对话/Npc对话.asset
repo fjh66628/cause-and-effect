@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: "Npc\u5BF9\u8BDD"
   m_EditorClassIdentifier: 
   dialogues:
-  - dialogue: "\u4F60\u597D"
+  - dialogue: "\u6211\u6CE8\u610F\u4F60\u5F88\u4E45\u4E86"
+  - dialogue: "\u4F60\u8D70\u4E0D\u51FA\u53BB\u7684"

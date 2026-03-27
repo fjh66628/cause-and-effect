@@ -965,13 +965,13 @@ MonoBehaviour:
       mapSize: {x: 9, y: 9}
       endStepCount: 2
       cardData:
-      - cardType: 0
+      - cardType: 1
         round: 0
         useCount: 1
-      - cardType: 0
+      - cardType: 2
         round: 0
         useCount: 1
-      - cardType: 0
+      - cardType: 3
         round: 0
         useCount: 1
       isCollapse: 0

@@ -431,7 +431,6 @@ public class GameManager : SingletonMono<GameManager>
             case MapCellContent.Key:
                 if (!toKey)
                 {
-                    toKey = true;
                     EventHandler.showDialogue(toTheKey);
                 }
                 break;
