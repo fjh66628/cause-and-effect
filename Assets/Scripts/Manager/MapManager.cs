@@ -392,13 +392,13 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
                 {
                     if (mapGrid[i, j].getCellContent == MapCellContent.Door_locked)
                     {
-                        EventHandler.CallChangeItem(MapCellContent.Door_opened, new Vector2Int(i, j));//调用改变物品事件
+                        EventHandler.CallChangeItem(MapCellContent.Door_locked, new Vector2Int(i, j));//调用改变物品事件
                         mapGrid[i, j].setCellContent(MapCellContent.Door_opened);//将关闭的门单元格设置为开启的门单元格
                         Debug.LogWarning("玩家改变了关闭的单元的门单元格");
                     }
                     else if (mapGrid[i, j].getCellContent == MapCellContent.Door_opened)
                     {
-                        EventHandler.CallChangeItem(MapCellContent.Door_locked, new Vector2Int(i, j));//调用改变物品事件
+                        EventHandler.CallChangeItem(MapCellContent.Door_opened, new Vector2Int(i, j));//调用改变物品事件
                         mapGrid[i, j].setCellContent(MapCellContent.Door_locked);//将开启的门单元格设置为关闭的门单元格
                         Debug.LogWarning("玩家改变了开启的单元的门单元格");
                     }
