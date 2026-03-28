@@ -41,5 +41,6 @@ public class LoadManager : SingletonMono<LoadManager>
         yield return SceneManager.LoadSceneAsync(targetName, LoadSceneMode.Additive);
         EventHandler.CallLevelLoaded();
         EventHandler.CallUpdateCard();
+        GameManager.Instance.SetGameState(GameState.Play);//游戏开始
     }
 }

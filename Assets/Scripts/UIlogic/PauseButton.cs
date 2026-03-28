@@ -11,7 +11,7 @@ public class PauseButton : MonoBehaviour
         StartCoroutine(ResumeGameButtonCoroutine());
         //Application.Quit();
     }
-    public IEnumerator ResumeGameButtonCoroutine()
+    IEnumerator ResumeGameButtonCoroutine()
     {
         LoadingAnimator.Instance.SetLoading("返回主菜单");
         yield return new WaitForSeconds(1.2f);

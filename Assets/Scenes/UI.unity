@@ -438,6 +438,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[2].playerStartPosition.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
+      propertyPath: Chapter.Array.data[1].levelManagements.Array.data[2].playerStartPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7981385685487350351, guid: 058f13c3b1f5fbb4cba72e974a332821, type: 3}
       propertyPath: Chapter.Array.data[0].levelManagements.Array.data[0].unitPositions.Array.size
       value: 1
       objectReference: {fileID: 0}
