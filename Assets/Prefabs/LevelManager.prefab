@@ -434,7 +434,7 @@ MonoBehaviour:
         round: 0
         useCount: 2
       isCollapse: 0
-    - playerStartPosition: {x: 7, y: 0}
+    - playerStartPosition: {x: 2, y: 6}
       unitPositions:
       - mapCellContent: 9
         position: {x: 0, y: 1}
@@ -693,7 +693,7 @@ MonoBehaviour:
         round: 0
         useCount: 2
       isCollapse: 1
-    - playerStartPosition: {x: 5, y: 0}
+    - playerStartPosition: {x: 4, y: 0}
       unitPositions:
       - mapCellContent: 7
         position: {x: 0, y: 2}
@@ -723,7 +723,7 @@ MonoBehaviour:
         position: {x: 6, y: 0}
         id: 007
       - mapCellContent: 7
-        position: {x: 2, y: 8}
+        position: {x: 8, y: 2}
         id: 008
       - mapCellContent: 9
         position: {x: 6, y: 5}
