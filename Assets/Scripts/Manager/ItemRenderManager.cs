@@ -134,16 +134,37 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
 
         SetItemColor(item, defaultColor);
     }
-    Color GetDefaultColor(string itemID)//获取物品默认颜色
+    /// <summary>
+    /// 获取物品默认颜色（优化版本）
+    /// 根据3位ID（000-199）生成区别明显的颜色
+    /// </summary>
+    Color GetDefaultColor(string itemID)
     {
         if (itemID.Length != 3)
         {
             return Color.white;
         }
-        float r = int.Parse(itemID[0].ToString());
-        float g = int.Parse(itemID[1].ToString());
-        float b = int.Parse(itemID[2].ToString());
-        return new Color((155f + r * 50) / 255f, (155f + g * 50) / 255f, (155f + b * 50) / 255f);
+
+        // 方法1：使用HSV色彩空间，确保颜色分布均匀
+        return GetColorFromHSV(itemID);
+    }
+
+    /// <summary>
+    /// 使用HSV色彩空间生成颜色（推荐）
+    /// </summary>
+    Color GetColorFromHSV(string itemID)
+    {
+        // 将3位ID转换为0-199的数值
+        int idValue = int.Parse(itemID);
+
+        // 使用黄金角分布，确保颜色均匀分布
+        float goldenRatio = 0.618033988749895f;
+        float hue = (idValue * goldenRatio) % 1.0f; // 色调：0-1
+        float saturation = 0.8f + (idValue % 3) * 0.1f; // 饱和度：0.8-1.0
+        float value = 0.7f + (idValue % 5) * 0.06f; // 明度：0.7-1.0
+
+        // HSV转RGB
+        return Color.HSVToRGB(hue, saturation, value);
     }
     void SetItemColor(GameObject item, Color color)//设置物品颜色
     {
