@@ -9,9 +9,7 @@ public class Buttons : MonoBehaviour
 {
     public void StartGame()
     {
-        string currentScene = "StartScene";
-        string targetScene = "Chapter1Floor1";
-        LoadManager.Instance.LoadLevel(currentScene, targetScene);
+        LoadManager.Instance.LoadLevel(1, 1);
     }
     public void ExitGame()
     {
