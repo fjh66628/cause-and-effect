@@ -434,13 +434,13 @@ MonoBehaviour:
         round: 0
         useCount: 2
       isCollapse: 0
-    - playerStartPosition: {x: 2, y: 6}
+    - playerStartPosition: {x: 4, y: 0}
       unitPositions:
       - mapCellContent: 9
         position: {x: 0, y: 1}
         id: 001
       - mapCellContent: 7
-        position: {x: 3, y: 6}
+        position: {x: 2, y: 6}
         id: 001
       - mapCellContent: 9
         position: {x: 6, y: 5}
