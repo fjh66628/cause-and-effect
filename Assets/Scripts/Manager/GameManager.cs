@@ -204,9 +204,9 @@ public class GameManager : SingletonMono<GameManager>
         if (flyCell == -1 || passWallCell == -1)//如果飞行蓝或穿墙小于0
         {
             playerState = PlayerState.Stand;//设置玩家状态为站立        
-            EventHandler.CallPlayerStand();//调用更新玩家状态事件
             if (flyCell == -1)//如果飞行蓝小于0
             {
+                EventHandler.CallPlayerStand();//调用更新玩家状态事件
                 flyCell = -2;
             }
             if (passWallCell == -1)//如果穿墙小于0` 
@@ -223,9 +223,11 @@ public class GameManager : SingletonMono<GameManager>
     {
         if (playerState != PlayerState.Stand)
         {
+            gameState = GameState.Pause;//游戏状态重置为暂停
             FindObjectOfType<UIManager>().HaveDialogue(cardTips);//调用显示对话框事件
         }
-        EventHandler.CallPlayerStateChange(card.getCardType);//调用更新玩家状态事件
+        if (playerState == PlayerState.Stand)
+            EventHandler.CallPlayerStateChange(card.getCardType);//调用更新玩家状态事件
         if (card.getCardType == PlayerState.Fly && flyCount > 0)//飞行技能且蓝条量大于0
         {
             playerState = PlayerState.Fly;//设置玩家状态为飞行

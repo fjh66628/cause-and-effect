@@ -124,6 +124,9 @@ public class PlayerMove : MonoBehaviour
             case PlayerState.Fly:
                 animator.SetTrigger("FlyUp");//设置移动动画触发
                 break;
+            case PlayerState.Stand:
+                PlayerStand();
+                break;
         }
     }
     void PlayerStand()//玩家站立事件

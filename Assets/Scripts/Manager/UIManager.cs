@@ -31,7 +31,7 @@ public class UIManager : MonoBehaviour
 
     public void HaveDialogue(DialogueSO dialogueData)
     {
-
+        GameManager.Instance.SetGameState(GameState.Pause);//游戏状态重置为暂停
         TextMeshProUGUI dialogueText = dialogueContainer.GetComponentInChildren<TextMeshProUGUI>();
         StartCoroutine(ShowDialogue(dialogueText, dialogueData));
     }
