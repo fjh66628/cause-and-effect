@@ -359,8 +359,11 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     }
     void ToTheKey(Vector2Int position)//玩家到达了钥匙单元格
     {
-        GameManager.Instance.GiveTips(MapCellContent.Key);//调用玩家到达钥匙单元格事件提示
-        ChangeTheDoorState(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getId);//改变门单元格的状态
+        if (GameManager.Instance.getPlayerState != PlayerState.Fly)//如果玩家是飞行状态
+        {
+            GameManager.Instance.GiveTips(MapCellContent.Key);//调用玩家到达钥匙单元格事件提示
+            ChangeTheDoorState(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getId);//改变门单元格的状态
+        }
         PlayerMove(position);//玩家移动到新的单元格
     }
     void ToTheDoorClosed()//玩家到达了关闭的门单元格
