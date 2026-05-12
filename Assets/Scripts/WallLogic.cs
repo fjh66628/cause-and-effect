@@ -10,7 +10,7 @@ public class WallLogic : MonoBehaviour
         {
             foreach (var item in transform.GetComponentsInChildren<SpriteRenderer>())
             {
-                item.color = new Color(1, 1, 1, 0.5f);
+                item.color = new Color(1, 1, 1, 0.7f);
             }
         }
         else

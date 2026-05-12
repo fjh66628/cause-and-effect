@@ -30,15 +30,31 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     // 纵坐标判断阈值
     [SerializeField] private float useCardThreshold = 100f; // 触发UseCard方法的纵坐标阈值
 
+    // 用于延迟操作的协程
+    private Coroutine showDetailCoroutine;
+    private Coroutine scaleCoroutine;
+
     void Start()
     {
-        // 获取必要的组件
+        // 避免在第一帧立即初始化Transform相关组件
+        StartCoroutine(DelayedStart());
+    }
+
+    private IEnumerator DelayedStart()
+    {
+        // 等待一帧，确保渲染更新完成
+        yield return null;
+
+        // 现在再获取组件
         rectTransform = GetComponent<RectTransform>();
         parentCanvas = GetComponentInParent<Canvas>();
         parentGridLayout = GetComponentInParent<GridLayoutGroup>();
         originalParent = transform.parent;
 
-        // 设置拖拽时的父级（通常是Canvas的直接子级）
+        // 记录原始位置
+        originalPosition = rectTransform.anchoredPosition;
+
+        // 设置拖拽父级
         if (parentCanvas != null)
         {
             GameObject dragParentObj = new GameObject("DragParent");
@@ -46,9 +62,6 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             dragParent.SetParent(parentCanvas.transform);
             dragParentObj.AddComponent<RectTransform>();
         }
-
-        // 记录原始位置
-        originalPosition = rectTransform.anchoredPosition;
     }
 
     void Update()
@@ -59,26 +72,78 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             UpdateDragPosition();
         }
     }
+
     // 鼠标悬停进入
     public void OnPointerEnter(PointerEventData eventData)
     {
         isMouseOver = true;
-        cardDetail.gameObject.SetActive(true);
-        cardDetailText.text = cardData.getCardDescription;
-        cardNameText.text = cardData.getCardName;
 
-        OnMouseSelected();
+        // 停止之前的显示协程
+        if (showDetailCoroutine != null)
+        {
+            StopCoroutine(showDetailCoroutine);
+        }
 
+        // 延迟显示详情面板，避免在事件回调中立即修改UI
+        showDetailCoroutine = StartCoroutine(DelayedShowDetail());
+
+        // 延迟执行缩放动画
+        if (scaleCoroutine != null)
+        {
+            StopCoroutine(scaleCoroutine);
+        }
+        scaleCoroutine = StartCoroutine(DelayedScaleChange(1.1f));
     }
 
     // 鼠标悬停离开
     public void OnPointerExit(PointerEventData eventData)
     {
         isMouseOver = false;
+
+        // 立即隐藏详情面板
         cardDetail.gameObject.SetActive(false);
-        OnMouseDeselected();
 
+        // 延迟恢复原始大小
+        if (scaleCoroutine != null)
+        {
+            StopCoroutine(scaleCoroutine);
+        }
+        scaleCoroutine = StartCoroutine(DelayedScaleChange(1f));
 
+        // 停止显示详情的协程
+        if (showDetailCoroutine != null)
+        {
+            StopCoroutine(showDetailCoroutine);
+        }
+    }
+
+    // 延迟显示详情面板
+    private IEnumerator DelayedShowDetail()
+    {
+        // 等待一帧，确保渲染更新完成
+        yield return null;
+
+        // 检查鼠标是否还在悬停状态
+        if (isMouseOver && !isDragging)
+        {
+            cardDetail.gameObject.SetActive(true);
+            cardDetailText.text = cardData.getCardDescription;
+            cardNameText.text = cardData.getCardName;
+        }
+    }
+
+    // 延迟缩放动画
+    private IEnumerator DelayedScaleChange(float targetScale)
+    {
+        // 等待一帧，确保渲染更新完成
+        yield return null;
+
+        // 检查当前状态是否允许修改缩放
+        if ((isMouseOver && !isDragging && targetScale > 1f) ||
+            (!isMouseOver && !isDragging && targetScale == 1f))
+        {
+            transform.localScale = Vector3.one * targetScale;
+        }
     }
 
     // 鼠标按下（开始拖拽）
@@ -99,120 +164,63 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
             EndDrag();
         }
     }
-    /// <summary>
-    /// 开始拖拽 - 修复版本
-    /// </summary>
 
     /// <summary>
-    /// 开始拖拽 - 修复版本
+    /// 开始拖拽
     /// </summary>
     void StartDrag(PointerEventData eventData)
-
     {
-
         isDragging = true;
 
-
+        // 停止所有延迟操作
+        if (scaleCoroutine != null)
+        {
+            StopCoroutine(scaleCoroutine);
+            scaleCoroutine = null;
+        }
 
         // 记录原始位置
-
         originalPosition = rectTransform.anchoredPosition;
 
-
-
         // 更精确的偏移计算
-
         if (parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
-
         {
-
             // Overlay模式：直接使用屏幕坐标计算偏移
-
             offset = rectTransform.position - (Vector3)eventData.position;
-
         }
-
         else
-
         {
-
             // Camera模式：使用局部坐标计算偏移
-
             Vector2 localPoint;
-
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-
                 rectTransform, eventData.position, eventData.pressEventCamera, out localPoint))
-
             {
-
                 offset = rectTransform.anchoredPosition - localPoint;
-
             }
-
             else
-
             {
-
                 // 备用方案：使用屏幕坐标
-
                 offset = rectTransform.position - (Vector3)eventData.position;
-
             }
-
         }
-
-
 
         // 切换到拖拽父级，避免受GridLayout影响
-
         if (dragParent != null)
-
         {
-
             transform.SetParent(dragParent);
-
         }
-
-
 
         // 设置到最上层
-
         transform.SetAsLastSibling();
-
-
-
     }
 
     /// <summary>
-    /// 鼠标悬停时调用的方法
-    /// </summary>
-    void OnMouseSelected()
-    {
-        // 悬停效果：放大10%
-        transform.localScale = Vector3.one * 1.1f;
-    }
-
-    /// <summary>
-    /// 鼠标离开时调用的方法
-    /// </summary>
-    void OnMouseDeselected()
-    {
-        // 如果不是正在拖拽，恢复原始大小
-        if (!isDragging)
-        {
-            transform.localScale = Vector3.one;
-        }
-
-    }
-    /// <summary>
-    /// 更新拖拽位置 - 修复版本
+    /// 更新拖拽位置
     /// </summary>
     void UpdateDragPosition()
     {
         if (!isDragging) return;
 
-        // 方法1：直接使用鼠标屏幕坐标（最简单有效）
         Vector3 mouseScreenPos = Input.mousePosition;
 
         // 根据Canvas渲染模式选择正确的坐标转换方式
@@ -220,7 +228,6 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         {
             // Screen Space - Overlay 模式：直接使用屏幕坐标
             rectTransform.position = mouseScreenPos + offset;
-            currentPosition = rectTransform.anchoredPosition;
         }
         else
         {
@@ -239,17 +246,31 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
                 // 备用方案：直接使用屏幕坐标
                 rectTransform.position = mouseScreenPos + offset;
             }
-            currentPosition = rectTransform.anchoredPosition;
         }
-
-
     }
+
     /// <summary>
     /// 结束拖拽
     /// </summary>
     void EndDrag()
     {
         isDragging = false;
+
+        // 延迟一帧再记录当前位置，避免立即读取Transform
+        StartCoroutine(DelayedEndDragOperations());
+    }
+
+    /// <summary>
+    /// 延迟执行结束拖拽的操作
+    /// </summary>
+    private IEnumerator DelayedEndDragOperations()
+    {
+        // 等待一帧，确保位置更新完成
+        yield return null;
+
+        // 记录当前位置
+        currentPosition = rectTransform.anchoredPosition;
+
         // 检查纵坐标是否超过阈值
         CheckVerticalPosition();
 
@@ -257,8 +278,11 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         ReturnToGridLayout();
 
         // 恢复原始大小
-        transform.localScale = Vector3.one;
-
+        if (scaleCoroutine != null)
+        {
+            StopCoroutine(scaleCoroutine);
+        }
+        scaleCoroutine = StartCoroutine(DelayedScaleChange(1f));
     }
 
     /// <summary>
@@ -275,7 +299,6 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // 计算与原始位置的垂直距离
         float verticalDistance = Mathf.Abs(currentY - originalY);
 
-
         // 如果垂直距离超过阈值，执行UseCard方法
         if (verticalDistance > useCardThreshold)
         {
@@ -283,13 +306,9 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
     }
 
-
     void UseCard()
     {
-
         EventHandler.CallPlayerUseSkill(cardData);
-
-
     }
 
     /// <summary>
@@ -300,7 +319,7 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // 回到原始父级
         transform.SetParent(originalParent);
 
-        // 回到原始位置
+        // 平滑回到GridLayout中的位置
         SmoothReturnToGrid();
     }
 
@@ -310,6 +329,17 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     void SmoothReturnToGrid()
     {
         rectTransform.anchoredPosition = originalPosition;
+
+        // 延迟一帧再强制刷新GridLayout
+        StartCoroutine(DelayedRebuildLayout());
+    }
+
+    /// <summary>
+    /// 延迟重建布局
+    /// </summary>
+    private IEnumerator DelayedRebuildLayout()
+    {
+        yield return null;
 
         // 强制刷新GridLayout（确保正确排列）
         if (parentGridLayout != null)
@@ -334,6 +364,12 @@ public class CardLogic : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     /// </summary>
     public void UpdateOriginalPosition()
     {
+        StartCoroutine(DelayedUpdateOriginalPosition());
+    }
+
+    private IEnumerator DelayedUpdateOriginalPosition()
+    {
+        yield return null;
         originalPosition = rectTransform.anchoredPosition;
     }
 

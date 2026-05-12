@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 public static class EventHandler
 {
+    public static Action<PlayerState> playerStateChange;//玩家状态改变事件
     public static Action<Vector2> onMouseLeftClick;//鼠标点击左键事件
     public static Action levelLoaded;//关卡加载事件
     public static Action breakTheWall;//玩家破坏墙单元格事件
@@ -72,5 +73,9 @@ public static class EventHandler
     public static void CallMouseClick()//调用鼠标点击事件
     {
         onMouseClick?.Invoke();
+    }
+    public static void CallPlayerStateChange(PlayerState state)//调用更新玩家状态事件
+    {
+        playerStateChange?.Invoke(state);
     }
 }

@@ -16,7 +16,7 @@ public class UnitPosition//其他单位位置
     /*门和钥匙（踏板）单位要用同一个id，否则会导致门和钥匙无法匹配。id的格式一共3位，3位分别对应
     门和钥匙的rgb值，使得系统能够生成符合视觉表现的门和钥匙。除开门和钥匙的id需要手动设置为0*/
     public MapCellContent getMapCellContent => mapCellContent;//获取单位类型
-    public Vector2Int getPosition => position;//获取单位初始位置
+    public Vector2Int getPosition => new Vector2Int(position.y, position.x);//获取单位初始位置
     public string getId => id;//获取单位ID
 }
 [System.Serializable]
@@ -52,7 +52,7 @@ public class LevelManagement//储存关卡信息的数据结构
     public int getEndStepCount => endStepCount;//获取需要走过几次终点
     public Vector2Int getMapSize => mapSize;//获取地图大小
     public List<UnitPosition> getUnitPositions => unitPositions;//获取其他单位位置
-    public Vector2Int getPlayerStartPosition => playerStartPosition;//获取玩家初始位置
+    public Vector2Int getPlayerStartPosition => new Vector2Int(playerStartPosition.y, playerStartPosition.x);//获取玩家初始位置
     public List<CardDataManagement> getCardData => cardData;//获取关卡的卡牌内容
 }
 [System.Serializable]
@@ -100,5 +100,4 @@ public class LevelManager : SingletonMono<LevelManager>
 
 
 
-    public Vector2Int getPlayerStartPosition => GetLevelManagement(GameManager.Instance.getChapterNumber, GameManager.Instance.getLevelNumber).getPlayerStartPosition;//获取玩家初始位置
 }

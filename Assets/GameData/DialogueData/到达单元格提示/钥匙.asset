@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8911c4ef0e63d344c94d5b5501f19713, type: 3}
   m_Name: "\u94A5\u5319"
   m_EditorClassIdentifier: 
-  dialogues: []
+  dialogues:
+  - dialogue: "\u8E29\u4E0A\u53BB\u4E4B\u540E\uFF0C\u4F60\u542C\u5230\u5494\u54D2\u4E00\u58F0"
+  - dialogue: "\u4F3C\u4E4E\u6709\u7684\u95E8\u6253\u5F00\u4E86"
+  - dialogue: "\u6709\u7684\u95E8\u53C8\u5173\u4E0A\u4E86"
