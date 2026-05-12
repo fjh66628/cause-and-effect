@@ -406,10 +406,10 @@ MonoBehaviour:
       - mapCellContent: 3
         position: {x: 6, y: 0}
         id: 
-      - mapCellContent: 2
+      - mapCellContent: 1
         position: {x: 4, y: 7}
         id: 
-      - mapCellContent: 2
+      - mapCellContent: 1
         position: {x: 5, y: 7}
         id: 
       - mapCellContent: 2
@@ -432,7 +432,7 @@ MonoBehaviour:
         useCount: 2
       - cardType: 3
         round: 0
-        useCount: 2
+        useCount: 3
       isCollapse: 0
     - playerStartPosition: {x: 4, y: 0}
       unitPositions:
