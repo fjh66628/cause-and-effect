@@ -9,7 +9,9 @@ public class Buttons : MonoBehaviour
 {
     public void StartGame()
     {
-        LoadManager.Instance.LoadLevel(1, 1);
+        string currentScene = "StartScene";
+        string targetScene = "Chapter1Floor1";
+        LoadManager.Instance.LoadLevel(currentScene, targetScene);
     }
     public void ExitGame()
     {
@@ -18,7 +20,7 @@ public class Buttons : MonoBehaviour
     public void LoadGame()
     {
         LoadManager.Instance.LoadLevelManager();
-        LoadingAnimator.Instance.SetLoading("选择场景");
+        LoadingAnimator.Instance.SetLoading("LevelManager");
     }
 
 }

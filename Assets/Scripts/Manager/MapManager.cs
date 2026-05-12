@@ -87,7 +87,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
             MapCellContent content = levelManagement.getUnitPositions[x].getMapCellContent;
 
             // 确保坐标在数组范围内
-            if (pos.x >= 0 && pos.x < mapGrid.GetLength(0) && pos.y >= 0 && pos.y < mapGrid.GetLength(1))
+            if (pos.x >= 0 && pos.x < 12 && pos.y >= 0 && pos.y < 12)
             {
                 mapGrid[pos.x, pos.y].setCellContent(content);
                 mapGrid[pos.x, pos.y].SetId(levelManagement.getUnitPositions[x].getId);
@@ -299,7 +299,6 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         {
             EventHandler.CallBreakTheWall();//调用玩家破坏墙单元格事件
             StartCoroutine(BreakTheWallAnimation(position));//玩家破坏墙单元格动画
-            GameManager.Instance.ChangePlayerState(PlayerState.Stand);//调用玩家到达墙单元格事件提示
         }
         else if (GameManager.Instance.getPlayerState == PlayerState.PassWall)//如果玩家可以穿墙单元格
         {
@@ -319,7 +318,7 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         if (GameManager.Instance.getPlayerState != PlayerState.Fly)//如果玩家可以破坏墙单元格
         {
             mapGrid[playerPosition.x, playerPosition.y].setCellContent(MapCellContent.Collapse);//将一次性门单元格设置为塌陷单元格
-            EventHandler.CallChangeItem(MapCellContent.Door_singleuse, playerPosition);//调用改变物品事件
+            EventHandler.CallChangeItem(MapCellContent.Collapse, playerPosition);//调用改变物品事件
             GameManager.Instance.GiveTips(MapCellContent.Door_singleuse);//调用玩家到达一次性门单元格事件提示
         }
     }
@@ -359,11 +358,8 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     }
     void ToTheKey(Vector2Int position)//玩家到达了钥匙单元格
     {
-        if (GameManager.Instance.getPlayerState != PlayerState.Fly)//如果玩家是飞行状态
-        {
-            GameManager.Instance.GiveTips(MapCellContent.Key);//调用玩家到达钥匙单元格事件提示
-            ChangeTheDoorState(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getId);//改变门单元格的状态
-        }
+        GameManager.Instance.GiveTips(MapCellContent.Key);//调用玩家到达钥匙单元格事件提示
+        ChangeTheDoorState(mapGrid[position.x + playerPosition.x, position.y + playerPosition.y].getId);//改变门单元格的状态
         PlayerMove(position);//玩家移动到新的单元格
     }
     void ToTheDoorClosed()//玩家到达了关闭的门单元格
@@ -395,13 +391,13 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
                 {
                     if (mapGrid[i, j].getCellContent == MapCellContent.Door_locked)
                     {
-                        EventHandler.CallChangeItem(MapCellContent.Door_locked, new Vector2Int(i, j));//调用改变物品事件
+                        EventHandler.CallChangeItem(MapCellContent.Door_opened, new Vector2Int(i, j));//调用改变物品事件
                         mapGrid[i, j].setCellContent(MapCellContent.Door_opened);//将关闭的门单元格设置为开启的门单元格
                         Debug.LogWarning("玩家改变了关闭的单元的门单元格");
                     }
                     else if (mapGrid[i, j].getCellContent == MapCellContent.Door_opened)
                     {
-                        EventHandler.CallChangeItem(MapCellContent.Door_opened, new Vector2Int(i, j));//调用改变物品事件
+                        EventHandler.CallChangeItem(MapCellContent.Door_locked, new Vector2Int(i, j));//调用改变物品事件
                         mapGrid[i, j].setCellContent(MapCellContent.Door_locked);//将开启的门单元格设置为关闭的门单元格
                         Debug.LogWarning("玩家改变了开启的单元的门单元格");
                     }

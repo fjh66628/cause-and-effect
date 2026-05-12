@@ -28,10 +28,14 @@ public class UIManager : MonoBehaviour
     private Dictionary<string, GameObject> createdCardInstances = new Dictionary<string, GameObject>();
     [SerializeField] private Image overImage;//游戏失败提示
     [SerializeField] private TextMeshProUGUI overText;//游戏失败提示文本
+    void Start()
+    {
+
+    }
 
     public void HaveDialogue(DialogueSO dialogueData)
     {
-        GameManager.Instance.SetGameState(GameState.Pause);//游戏状态重置为暂停
+
         TextMeshProUGUI dialogueText = dialogueContainer.GetComponentInChildren<TextMeshProUGUI>();
         StartCoroutine(ShowDialogue(dialogueText, dialogueData));
     }
@@ -51,7 +55,6 @@ public class UIManager : MonoBehaviour
         }
         EventHandler.onMouseClick -= CheckClicked;
         DialogueHide();
-        yield return new WaitForSeconds(0.11f);
         GameManager.Instance.SetGameState(GameState.Play);
     }
     void CheckClicked()//检查是否点击了对话框
@@ -162,6 +165,7 @@ public class UIManager : MonoBehaviour
                 if (instance != null)
                 {
                     Destroy(instance);
+                    Debug.Log($"清理孤立的卡牌实例: {cardId}");
                 }
             }
         }

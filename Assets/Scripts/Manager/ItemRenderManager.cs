@@ -31,8 +31,6 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
 
     [Header("物品预制体")]
     [SerializeField] private List<prefabMapping> itemPrefabs;//物品预制体列表
-    [Header("爆炸效果")]
-    [SerializeField] private GameObject explodePrefab;//爆炸效果预制体
 
     Dictionary<string, ItemData> itemDatas = new Dictionary<string, ItemData>();//物品数据字典
     MapManager mapManager;
@@ -40,13 +38,13 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
     {
         EventHandler.changeItem += ChangeItem;//注销改变物品事件
         EventHandler.levelLoaded += LoadAllItems;
-
+        EventHandler.passTheWall += PassTheWall;//注销玩家穿墙单元格事件
     }
     void OnDisable()
     {
         EventHandler.changeItem -= ChangeItem;//注销改变物品事件
         EventHandler.levelLoaded -= LoadAllItems;
-
+        EventHandler.passTheWall -= PassTheWall;//注销玩家穿墙单元格事件
     }
 
     void LoadAllItems()
@@ -73,6 +71,19 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         }
         //加载所有物品
     }
+    void PassTheWall(Vector2Int position)//玩家穿墙单元格事件
+    {
+        if (itemDatas.TryGetValue(GetItemID(MapCellContent.Wall, position), out ItemData itemData))
+        {
+            Color color = itemData.getItemObject.GetComponent<SpriteRenderer>().color;
+            itemData.getItemObject.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.5f);
+        }
+        if (itemDatas.TryGetValue(GetItemID(MapCellContent.Wall_unbreakable, position), out itemData))
+        {
+            Color color = itemData.getItemObject.GetComponent<SpriteRenderer>().color;
+            itemData.getItemObject.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0.5f);
+        }
+    }
     void CreatItem(MapCellContent mapCellContent)//根据物品种类创建物品
     {
         prefabMapping prefabMapping = itemPrefabs.Find(x => x.getMapCellContent == mapCellContent);
@@ -85,7 +96,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         GameObject targetSceneRoot = GameObject.Find($"ChapterRoot"); // 找到目标场景的根节点
         foreach (Vector2Int position in itemsPositions)
         {
-            if (mapManager.getMapGrid[position.x, position.y].getId == "" || mapManager.getMapGrid[position.x, position.y].getId != "")
+            if (mapManager.getMapGrid[position.x, position.y].getId == "0" || mapManager.getMapGrid[position.x, position.y].getId == "")
             {
 
                 GameObject item = Instantiate(prefabMapping.getItemPrefab, mapManager.GetWorldPosition(position), Quaternion.identity);
@@ -93,7 +104,6 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
                 SetItemDefaultColor(item, mapManager.getMapGrid[position.x, position.y].getId);
                 string itemID = GetItemID(mapCellContent, position);
                 itemDatas.Add(itemID, new ItemData(itemID, item));
-
             }
             else
             {
@@ -125,6 +135,8 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             itemDatas.Remove(itemId);
             return true;
         }
+
+        Debug.LogWarning($"未找到物品ID: {itemId}");
         return false;
     }
 
@@ -134,37 +146,16 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
 
         SetItemColor(item, defaultColor);
     }
-    /// <summary>
-    /// 获取物品默认颜色（优化版本）
-    /// 根据3位ID（000-199）生成区别明显的颜色
-    /// </summary>
-    Color GetDefaultColor(string itemID)
+    Color GetDefaultColor(string itemID)//获取物品默认颜色
     {
         if (itemID.Length != 3)
         {
             return Color.white;
         }
-
-        // 方法1：使用HSV色彩空间，确保颜色分布均匀
-        return GetColorFromHSV(itemID);
-    }
-
-    /// <summary>
-    /// 使用HSV色彩空间生成颜色（推荐）
-    /// </summary>
-    Color GetColorFromHSV(string itemID)
-    {
-        // 将3位ID转换为0-199的数值
-        int idValue = int.Parse(itemID);
-
-        // 使用黄金角分布，确保颜色均匀分布
-        float goldenRatio = 0.618033988749895f;
-        float hue = (idValue * goldenRatio) % 1.0f; // 色调：0-1
-        float saturation = 0.8f + (idValue % 3) * 0.1f; // 饱和度：0.8-1.0
-        float value = 0.7f + (idValue % 5) * 0.06f; // 明度：0.7-1.0
-
-        // HSV转RGB
-        return Color.HSVToRGB(hue, saturation, value);
+        float r = int.Parse(itemID[0].ToString());
+        float g = int.Parse(itemID[1].ToString());
+        float b = int.Parse(itemID[2].ToString());
+        return new Color((155f + r * 10) / 255f, (155f + g * 10) / 255f, (155f + g * 10f) / 255f);
     }
     void SetItemColor(GameObject item, Color color)//设置物品颜色
     {
@@ -198,7 +189,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         }
         else
         {
-            Debug.LogWarning($"在位置 {position} 未找到物品对象{itemId}");
+            Debug.LogWarning($"在位置 {position} 未找到物品对象");
         }
     }
     void ChangeItemState(Vector2Int position, MapCellContent fromState)
@@ -218,7 +209,10 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
             toState = MapCellContent.Collapse;
         }
         // 1. 卸载旧物品
-        UnloadItemById(fromId);
+        if (UnloadItemById(fromId))
+        {
+            Debug.Log($"成功卸载 {fromState} 物品");
+        }
         GameObject targetSceneRoot = GameObject.Find($"ChapterRoot"); // 找到目标场景的根节点
         // 2. 创建新物品    
         prefabMapping newItemPrefab = itemPrefabs.Find(x => x.getMapCellContent == toState);
