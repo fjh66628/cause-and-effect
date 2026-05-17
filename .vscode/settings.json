@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "cause_and_effect_shining.sln"
+    "dotnet.defaultSolution": "cause and effect.sln"
 }

@@ -1,179 +1,195 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LoadManager : SingletonMono<LoadManager>
 {
-    public void LoadLevel(string sceneName, string targetName)
+    const string UISceneName = "UI";
+    const string EndSceneName = "END";
+    const float LoadSceneDelay = 0.8f;
+
+    bool isLoading = false;
+
+    public void LoadLevel(string currentSceneName, string targetName)
     {
-        StartCoroutine(LoadLevelCoroutine(sceneName, targetName));
+        if (TryGetLevelNumbers(targetName, out int chapter, out int level))
+        {
+            StartCoroutine(LoadLevelCoroutine(chapter, level, currentSceneName, true));
+            return;
+        }
+
+        StartCoroutine(LoadSceneByNameCoroutine(currentSceneName, targetName));
     }
+
     public void LoadLevelManager()
     {
         StartCoroutine(LoadLevelManagerCoroutine());
     }
+
     IEnumerator LoadLevelManagerCoroutine()
     {
         yield return new WaitForSeconds(1.2f);
         SceneManager.LoadScene("LevelManager");
     }
-    public void LoadLevel(int Chapter, int Level)
+
+    public void LoadLevel(int chapter, int level)
     {
-        StartCoroutine(LoadLevelCoroutine(Chapter, Level));
+        StartCoroutine(LoadLevelCoroutine(chapter, level, null, true));
     }
-    IEnumerator LoadLevelCoroutine(string sceneName, string targetName)
+
+    public void LoadNextLevel()
     {
-        LoadingAnimator.Instance.SetLoading(targetName);
-        yield return new WaitForSeconds(1.2f);
+        int currentChapter = GameManager.Instance.getChapterNumber;
+        int currentLevel = GameManager.Instance.getLevelNumber;
+        string currentSceneName = GetLevelSceneName(currentChapter, currentLevel);
 
-        // 1. 卸载原有场景 + 加载UI场景
-        yield return SceneManager.LoadSceneAsync("UI");
-        yield return null;
+        int nextChapter = currentChapter;
+        int nextLevel = currentLevel + 1;
 
-        // 2. 加载目标场景
-        yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-        yield return null;
-
-        // 3. 数据初始化（地图、卡牌）
-        EventHandler.CallLevelDataReady();
-        yield return null;
-
-        // 4. 渲染（物品、相机、UI）
-        EventHandler.CallLevelLoaded();
-
-    }
-    IEnumerator LoadLevelCoroutine(int Chapter, int Level)
-    {
-        LevelManagement levelInfo = LevelManager.Instance.GetLevelManagement(Chapter, Level);
-        if (levelInfo == null)
+        if (nextLevel > LevelManager.Instance.GetLevelCount(nextChapter))
         {
-            Debug.LogError($"LoadLevelCoroutine: GetLevelManagement返回null, Chapter={Chapter}, Level={Level}");
-            yield break;
+            nextLevel = 1;
+            nextChapter++;
         }
-        int totalEndStep = levelInfo.getEndStepCount;
-        int currentEndStep = GameManager.Instance.getEndStepCount;
-        string sceneName = $"Chapter{Chapter}Floor{Level}";
-        string displayText = $"Chapter{Chapter}Floor{Level} 终点{currentEndStep}/{totalEndStep}";
-        LoadingAnimator.Instance.SetLoading(displayText);
-        yield return new WaitForSeconds(1.2f);
 
-        // 1. 卸载原有场景 + 加载UI场景
-        yield return SceneManager.LoadSceneAsync("UI");
-        yield return null;
+        if (!LevelManager.Instance.HasLevel(nextChapter, nextLevel))
+        {
+            LoadingAnimator.Instance.SetLoading("\u6e38\u620f\u7ed3\u675f");
+            StartCoroutine(LoadEndSceneCoroutine());
+            return;
+        }
 
-        // 2. GameManager数据更新
-        GameManager.Instance.SetLevelCount(Chapter, Level);
-
-        // 3. 加载目标场景
-        yield return SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-        yield return null;
-
-        // 4. 数据初始化（地图、卡牌）
-        EventHandler.CallLevelDataReady();
-        yield return null;
-
-        // 5. 渲染（物品、相机、UI）
-        EventHandler.CallLevelLoaded();
-        EventHandler.CallUpdateCard();
-        GameManager.Instance.SetGameState(GameState.Play);//游戏开始
-    }
-
-    public void LoadNextLevel(string currentSceneName, string nextSceneName)
-    {
-        StartCoroutine(LoadNextLevelCoroutine(currentSceneName, nextSceneName));
-    }
-
-    IEnumerator LoadNextLevelCoroutine(string currentSceneName, string nextSceneName)
-    {
-        GameManager.Instance.SetGameState(GameState.Pause);
-
-        yield return new WaitForSeconds(0.5f);
-
-        // 1. 卸载原有场景
-        yield return SceneManager.UnloadSceneAsync(currentSceneName);
-        Resources.UnloadUnusedAssets();
-        yield return null;
-
-        // 2. GameManager数据更新
-        GameManager.Instance.ResetEndStepCount();
-        GameManager.Instance.SetCardNumber();
-        yield return null;
-
-        // 3. 新场景加载
-        yield return SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(nextSceneName));
-        yield return null;
-
-        // 4. 数据初始化（地图、卡牌）
-        EventHandler.CallLevelDataReady();
-        yield return null;
-
-        // 5. 渲染（物品、相机、UI）
-        EventHandler.CallLevelLoaded();
-        EventHandler.CallUpdateCard();
-
-        yield return new WaitForSeconds(2f);
-
-        GameManager.Instance.SetGameState(GameState.Play);
-
-    }
-
-    public void LoadEndScene()
-    {
-        StartCoroutine(LoadEndSceneCoroutine());
-    }
-
-    IEnumerator LoadEndSceneCoroutine()
-    {
-        GameManager.Instance.SetGameState(GameState.Pause);
-
-        yield return new WaitForSeconds(0.5f);
-
-        yield return SceneManager.LoadSceneAsync("END", LoadSceneMode.Single);
-
-        yield return new WaitForSeconds(0.5f);
-
+        StartCoroutine(LoadLevelCoroutine(nextChapter, nextLevel, currentSceneName, false));
     }
 
     public void ReloadCurrentLevel()
     {
-        LoadingAnimator.Instance.SetLoading("重新加载关卡");
-        StartCoroutine(ReloadCurrentLevelCoroutine());
+        int chapter = GameManager.Instance.getChapterNumber;
+        int level = GameManager.Instance.getLevelNumber;
+        string currentSceneName = GetLevelSceneName(chapter, level);
+
+        StartCoroutine(LoadLevelCoroutine(chapter, level, currentSceneName, false));
     }
 
-    IEnumerator ReloadCurrentLevelCoroutine()
+    public void LoadEndScene()
     {
+        LoadingAnimator.Instance.SetLoading("\u6e38\u620f\u7ed3\u675f");
+        StartCoroutine(LoadEndSceneCoroutine());
+    }
+
+    IEnumerator LoadLevelCoroutine(int chapter, int level, string currentSceneName, bool loadUIScene)
+    {
+        if (isLoading)
+        {
+            yield break;
+        }
+
+        isLoading = true;
+
+        string targetName = GetLevelSceneName(chapter, level);
+        bool hasLevelData = LevelManager.Instance.HasLevel(chapter, level);
+        LoadingAnimator.Instance.SetLoading(hasLevelData ? BuildLoadingText(chapter, level) : targetName);
+        yield return new WaitForSeconds(LoadSceneDelay);
+
+        if (loadUIScene)
+        {
+            yield return SceneManager.LoadSceneAsync(UISceneName);
+        }
+
+        GameManager.Instance.SetGameState(GameState.Pause);
+        if (!LevelManager.Instance.HasLevel(chapter, level))
+        {
+            Debug.LogError($"Level data not found: Chapter{chapter}Level{level}");
+            isLoading = false;
+            yield break;
+        }
+
+        if (!hasLevelData)
+        {
+            LoadingAnimator.Instance.SetLoading(BuildLoadingText(chapter, level));
+            yield return new WaitForSeconds(LoadSceneDelay);
+        }
+
+        if (!string.IsNullOrEmpty(currentSceneName) && SceneManager.GetSceneByName(currentSceneName).isLoaded)
+        {
+            yield return SceneManager.UnloadSceneAsync(currentSceneName);
+            Resources.UnloadUnusedAssets();
+            yield return null;
+        }
+
+        GameManager.Instance.SetLevelCount(chapter, level);
+        yield return SceneManager.LoadSceneAsync(targetName, LoadSceneMode.Additive);
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(targetName));
+
+        EventHandler.CallLevelLoaded();
+        GameManager.Instance.ResetGameStateForLevelLoad();
+        EventHandler.CallUpdateCard();
+        GameManager.Instance.SetGameState(GameState.Play);
+
+        isLoading = false;
+    }
+
+    IEnumerator LoadSceneByNameCoroutine(string currentSceneName, string targetName)
+    {
+        if (isLoading)
+        {
+            yield break;
+        }
+
+        isLoading = true;
+        GameManager.Instance.SetGameState(GameState.Pause);
+        LoadingAnimator.Instance.SetLoading(targetName);
+        yield return new WaitForSeconds(1.2f);
+
+        if (!string.IsNullOrEmpty(currentSceneName) && SceneManager.GetSceneByName(currentSceneName).isLoaded)
+        {
+            yield return SceneManager.UnloadSceneAsync(currentSceneName);
+        }
+
+        yield return SceneManager.LoadSceneAsync(targetName, LoadSceneMode.Additive);
+        isLoading = false;
+    }
+
+    IEnumerator LoadEndSceneCoroutine()
+    {
+        if (isLoading)
+        {
+            yield break;
+        }
+
+        isLoading = true;
         GameManager.Instance.SetGameState(GameState.Pause);
 
         yield return new WaitForSeconds(0.5f);
+        yield return SceneManager.LoadSceneAsync(EndSceneName, LoadSceneMode.Single);
+        yield return new WaitForSeconds(0.5f);
 
-        string currentSceneName = $"Chapter{GameManager.Instance.getChapterNumber}Level{GameManager.Instance.getLevelNumber}";
+        isLoading = false;
+    }
 
-        // 1. 卸载原有场景
-        yield return SceneManager.UnloadSceneAsync(currentSceneName);
-        Resources.UnloadUnusedAssets();
-        yield return null;
+    string BuildLoadingText(int chapter, int level)
+    {
+        int endStepCount = LevelManager.Instance.GetLevelManagement(chapter, level).getEndStepCount;
+        return $"Chapter{chapter}Level{level}\n\u9700\u8981\u8d70\u8fc7{endStepCount}\u6b21\u7ec8\u70b9";
+    }
 
-        // 2. GameManager数据更新
-        GameManager.Instance.ResetGameStateForReload();
-        yield return null;
+    string GetLevelSceneName(int chapter, int level)
+    {
+        return $"Chapter{chapter}Floor{level}";
+    }
 
-        // 3. 新场景加载
-        yield return SceneManager.LoadSceneAsync(currentSceneName, LoadSceneMode.Additive);
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentSceneName));
-        yield return null;
+    bool TryGetLevelNumbers(string sceneName, out int chapter, out int level)
+    {
+        chapter = 0;
+        level = 0;
 
-        // 4. 数据初始化（地图、卡牌）
-        EventHandler.CallLevelDataReady();
-        yield return null;
+        if (string.IsNullOrEmpty(sceneName) || !sceneName.StartsWith("Chapter") || !sceneName.Contains("Floor"))
+        {
+            return false;
+        }
 
-        // 5. 渲染（物品、相机、UI）
-        EventHandler.CallLevelLoaded();
-        EventHandler.CallUpdateCard();
-
-        GameManager.Instance.SetGameState(GameState.Play);
-
-        Debug.Log("关卡重新加载完成");
+        string[] parts = sceneName.Replace("Chapter", "").Split("Floor");
+        return parts.Length == 2 && int.TryParse(parts[0], out chapter) && int.TryParse(parts[1], out level);
     }
 }
+

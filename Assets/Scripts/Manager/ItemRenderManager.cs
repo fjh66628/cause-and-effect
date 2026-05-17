@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -61,7 +61,7 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
         mapManager = FindObjectOfType<MapManager>();
         if (mapManager == null)
         {
-            yield break;
+            Debug.LogError("MapManager not found");
         }
         foreach (MapCellContent mapCellContent in System.Enum.GetValues(typeof(MapCellContent)))
         {
@@ -75,7 +75,6 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
     }
     void CreatItem(MapCellContent mapCellContent)//根据物品种类创建物品
     {
-        if (mapManager == null) return;
         prefabMapping prefabMapping = itemPrefabs.Find(x => x.getMapCellContent == mapCellContent);
         if (prefabMapping == null)
         {
@@ -204,7 +203,6 @@ public class ItemRenderManager : SingletonMono<ItemRenderManager>
     }
     void ChangeItemState(Vector2Int position, MapCellContent fromState)
     {
-        if (mapManager == null) return;
         string fromId = GetItemID(fromState, position);
         MapCellContent toState = fromState;
         if (fromState == MapCellContent.Door_locked)
