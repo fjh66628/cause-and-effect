@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
@@ -23,6 +23,7 @@ public class GameManager : SingletonMono<GameManager>
     [SerializeField] private int flyCell = 1;//飞行可以飞行几个墙单元格
     [SerializeField] private DialogueSO cardTips;//卡牌提示对话框(在非站立状态下显示)
     public int getEndStepCount => endStepCount;//获取走过了几次终点
+    public void ResetEndStepCount() { endStepCount = 1; }//重置终点次数
     public bool IsPlayerMoving => isPlayerMoving;//是否玩家正在移动
     public void SetIsPlayerMoving(bool isMoving)//设置玩家是否正在移动
     {
@@ -66,14 +67,14 @@ public class GameManager : SingletonMono<GameManager>
         EventHandler.playerUseSkill += UseSkill;
         EventHandler.updateCard += SetCardData;
         EventHandler.playerMove += OnPlayerMove;
-        EventHandler.levelLoaded += SetCardNumber;
+        EventHandler.levelDataReady += SetCardNumber;
     }
     void OnDisable()
     {
         EventHandler.playerUseSkill -= UseSkill;
         EventHandler.updateCard -= SetCardData;
         EventHandler.playerMove -= OnPlayerMove;
-        EventHandler.levelLoaded -= SetCardNumber;
+        EventHandler.levelDataReady -= SetCardNumber;
     }
 
 
@@ -103,25 +104,42 @@ public class GameManager : SingletonMono<GameManager>
     public bool ReachTheEnd()//玩家到达目标单元格
     {
         endStepCount++;//走过了几次终点增加
-        if (endStepCount > LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getEndStepCount)//如果走过了几次终点大于等于需要走过了几次终点
+        LevelManagement currentLevel = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber);
+        if (currentLevel == null)
         {
-            string currentSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//获取当前场景名称
+            Debug.LogError($"ReachTheEnd: GetLevelManagement返回null, Chapter={ChapterNumber}, Level={levelNumber}");
+            return false;
+        }
+        if (endStepCount > currentLevel.getEndStepCount)//如果走过了几次终点大于等于需要走过了几次终点
+        {
+            string currentSceneName = $"Chapter{ChapterNumber}Level{levelNumber}";//获取当前场景名称
             levelNumber++;//关卡编号增加
-            if (levelNumber > LevelManager.Instance.getChapter.getLevelManagement.Count)//如果关卡编号大于章节中的关卡数量
+            ChapterManagement chapter = LevelManager.Instance.getChapter;
+            if (chapter == null || levelNumber > chapter.getLevelManagement.Count)//如果关卡编号大于章节中的关卡数量
             {
                 levelNumber = 1;//关卡编号重置为1
                 ChapterNumber++;//章节编号增加
             }
-            string nextSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";//下一关场景名称
+            string nextSceneName = $"Chapter{ChapterNumber}Level{levelNumber}";//下一关场景名称
 
-            if (LevelManager.Instance.getChapterNumber < ChapterNumber || LevelManager.Instance.getChapter.getLevelManagement.Count < levelNumber)//如果章节中的关卡数量等于关卡编号
+            if (LevelManager.Instance.getChapterNumber < ChapterNumber || (chapter != null && chapter.getLevelManagement.Count < levelNumber))//如果章节中的关卡数量等于关卡编号
             {
                 LoadingAnimator.Instance.SetLoading("游戏结束");
-                StartCoroutine(LoadEndScene());//加载结束场景
+                LoadManager.Instance.LoadEndScene();//加载结束场景
                 return true;//返回true
             }
-            LoadingAnimator.Instance.SetLoading(nextSceneName);//加载下一关
-            StartCoroutine(LoadNextLevel(currentSceneName, nextSceneName));//加载下一关
+            LevelManagement nextLevel = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber);
+            if (nextLevel == null)
+            {
+                Debug.LogError($"ReachTheEnd: 下一关GetLevelManagement返回null, Chapter={ChapterNumber}, Level={levelNumber}");
+                LoadingAnimator.Instance.SetLoading("游戏结束");
+                LoadManager.Instance.LoadEndScene();
+                return true;
+            }
+            int nextTotalEndStep = nextLevel.getEndStepCount;
+            string nextSceneDisplay = $"Chapter{ChapterNumber}Level{levelNumber} 终点1/{nextTotalEndStep}";
+            LoadingAnimator.Instance.SetLoading(nextSceneDisplay);//加载下一关
+            LoadManager.Instance.LoadNextLevel(currentSceneName, nextSceneName);//加载下一关
             EventHandler.CallUpdateCard();//调用更新卡牌数据事件
             return true;//返回true
         }
@@ -133,37 +151,15 @@ public class GameManager : SingletonMono<GameManager>
         }
     }
 
-    IEnumerator LoadNextLevel(string currentSceneName, string nextSceneName)//加载下一关
+    public void SetCardNumber()//设置卡牌蓝数目
     {
-        gameState = GameState.Pause;//游戏状态重置为暂停
-
-        yield return new WaitForSeconds(0.5f);//等待0.5秒
-
-        yield return SceneManager.UnloadSceneAsync(currentSceneName);
-
-        // 1. 卸载无用资源
-        Resources.UnloadUnusedAssets();
-        yield return null;
-
-        yield return SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);//等待场景加载完成
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(nextSceneName));//设置下一关场景为活动场景
-        endStepCount = 1;//重置走过了几次终点
-        EventHandler.CallLevelLoaded();//调用关卡加载事件
-
-
-        SetCardNumber();//设置卡牌蓝数目
-
-        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
-
-
-        yield return new WaitForSeconds(2f);//等待2秒
-
-        gameState = GameState.Play;//游戏状态重置为播放
-
-    }
-    void SetCardNumber()//设置卡牌蓝数目
-    {
-        List<CardDataManagement> cardList = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber).getCardData;//获取所有卡片数据
+        LevelManagement level = LevelManager.Instance.GetLevelManagement(ChapterNumber, levelNumber);
+        if (level == null)
+        {
+            Debug.LogError($"SetCardNumber: GetLevelManagement返回null, Chapter={ChapterNumber}, Level={levelNumber}");
+            return;
+        }
+        List<CardDataManagement> cardList = level.getCardData;//获取所有卡片数据
         foreach (CardDataManagement card in cardList)//遍历所有卡片数据
         {
             switch (card.getCardType)
@@ -271,43 +267,14 @@ public class GameManager : SingletonMono<GameManager>
     /// </summary>
     public void ReloadCurrentLevel()
     {
-        LoadingAnimator.Instance.SetLoading("重新加载关卡");//显示加载动画
-        StartCoroutine(ReloadCurrentLevelCoroutine());
+        LoadManager.Instance.ReloadCurrentLevel();
     }
 
-    IEnumerator ReloadCurrentLevelCoroutine()
-    {
-
-        // 1. 暂停游戏
-        gameState = GameState.Pause;
-
-        yield return new WaitForSeconds(0.5f);
-
-        // 3. 卸载当前场景
-        string currentSceneName = $"Chapter{ChapterNumber}Floor{levelNumber}";
-        yield return SceneManager.UnloadSceneAsync(currentSceneName);
-
-        // 4. 清理资源
-        Resources.UnloadUnusedAssets();
-        yield return null;
-
-        // 5. 重新加载同一场景
-        yield return SceneManager.LoadSceneAsync(currentSceneName, LoadSceneMode.Additive);
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(currentSceneName));
-
-        // 6. 重置游戏状态
-        ResetGameStateForReload();
-        // 7. 播放淡入动画并恢复游戏
-
-        gameState = GameState.Play;
-
-        Debug.Log("关卡重新加载完成");
-    }
 
     /// <summary>
     /// 重置游戏状态（重新加载时调用）
     /// </summary>
-    private void ResetGameStateForReload()
+    public void ResetGameStateForReload()
     {
         // 重置步数计数
         endStepCount = 1;
@@ -323,10 +290,6 @@ public class GameManager : SingletonMono<GameManager>
 
         // 重新获取卡牌数据
         SetCardData();
-
-        // 触发关卡加载事件
-        EventHandler.CallLevelLoaded();
-        EventHandler.CallUpdateCard();//调用更新卡牌数据事件
     }
 
     public int GetCardUseData(string cardName)//获取卡牌使用次数
@@ -349,20 +312,6 @@ public class GameManager : SingletonMono<GameManager>
         return 0;
     }
 
-    IEnumerator LoadEndScene()
-    {
-        gameState = GameState.Pause;//游戏状态重置为暂停
-
-
-        yield return new WaitForSeconds(0.5f);//等待0.5秒
-
-
-        // 加载结束场景（单场景模式）
-        yield return SceneManager.LoadSceneAsync("END", LoadSceneMode.Single);
-
-        yield return new WaitForSeconds(0.5f);//等待0.5秒
-
-    }
 
     public string GetBuffText()
     {

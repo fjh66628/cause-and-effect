@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -24,11 +24,11 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
     public Vector2Int getPlayerPosition => playerPosition;//获取玩家位置
     void OnEnable()
     {
-        EventHandler.levelLoaded += UpdateMapInfo;//注册关卡加载事件
+        EventHandler.levelDataReady += UpdateMapInfo;//注册关卡数据就绪事件
     }
     void OnDisable()
     {
-        EventHandler.levelLoaded -= UpdateMapInfo;//注销关卡加载事件
+        EventHandler.levelDataReady -= UpdateMapInfo;//注销关卡数据就绪事件
     }
 
 
@@ -42,6 +42,11 @@ public class MapManager : MonoBehaviour//这个脚本管理地图中的坐标
         }
 
         levelManagement = LevelManager.Instance.GetLevelManagement(GameManager.Instance.getChapterNumber, GameManager.Instance.getLevelNumber);
+        if (levelManagement == null)
+        {
+            Debug.LogError($"UpdateMapInfo: GetLevelManagement返回null, Chapter={GameManager.Instance.getChapterNumber}, Level={GameManager.Instance.getLevelNumber}");
+            return;
+        }
         bool isCollapse = levelManagement.getIsCollapse;
         if (isCollapse)
         {

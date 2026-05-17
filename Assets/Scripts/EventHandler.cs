@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
@@ -7,6 +7,7 @@ public static class EventHandler
     public static Action<PlayerState> playerStateChange;//玩家状态改变事件
     public static Action<Vector2> onMouseLeftClick;//鼠标点击左键事件
     public static Action levelLoaded;//关卡加载事件
+    public static Action levelDataReady;//关卡数据就绪事件（地图、卡牌等数据初始化完成后触发，早于levelLoaded）
     public static Action breakTheWall;//玩家破坏墙单元格事件
     public static Action mapLoaded;//地图加载事件
     public static Action<MapCellContent, Vector2Int> changeItem;//改变物品事件
@@ -28,6 +29,10 @@ public static class EventHandler
     public static void CallLevelLoaded()//调用关卡加载事件
     {
         levelLoaded?.Invoke();
+    }
+    public static void CallLevelDataReady()//调用关卡数据就绪事件
+    {
+        levelDataReady?.Invoke();
     }
     public static void CallBreakTheWall()//调用玩家破坏墙单元格事件
     {

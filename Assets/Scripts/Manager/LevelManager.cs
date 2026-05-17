@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -76,18 +76,62 @@ public class LevelManager : SingletonMono<LevelManager>
     [SerializeField] private CardDataSO cardData;//传入卡牌内容
     public List<CardData> getCardData => cardData.getCardList;//获取传入卡牌内容
     public int getChapterNumber => Chapter.Count;//获取章节数量
-    public ChapterManagement getChapter => Chapter[GameManager.Instance.getChapterNumber - 1];//获取章节编号
+    public ChapterManagement getChapter
+    {
+        get
+        {
+            int chapterNumber = GameManager.Instance.getChapterNumber;
+            if (Chapter == null || Chapter.Count == 0)
+            {
+                Debug.LogError($"getChapter: Chapter列表为空");
+                return null;
+            }
+            if (chapterNumber < 1 || chapterNumber > Chapter.Count)
+            {
+                Debug.LogError($"getChapter: 章节编号越界 chapterNumber={chapterNumber}, Chapter总数={Chapter.Count}");
+                return null;
+            }
+            return Chapter[chapterNumber - 1];
+        }
+    }//获取章节编号
 
     public LevelManagement GetLevelManagement(int chapterNumber, int levelNumber)//获取关卡信息
     {
-        return Chapter[chapterNumber - 1].getLevelManagement[levelNumber - 1];
+        if (Chapter == null || Chapter.Count == 0)
+        {
+            Debug.LogError($"GetLevelManagement: Chapter列表为空, chapterNumber={chapterNumber}, levelNumber={levelNumber}");
+            return null;
+        }
+        if (chapterNumber < 1 || chapterNumber > Chapter.Count)
+        {
+            Debug.LogError($"GetLevelManagement: 章节编号越界 chapterNumber={chapterNumber}, Chapter总数={Chapter.Count}");
+            return null;
+        }
+        var levelList = Chapter[chapterNumber - 1].getLevelManagement;
+        if (levelList == null || levelList.Count == 0)
+        {
+            Debug.LogError($"GetLevelManagement: 关卡列表为空, chapterNumber={chapterNumber}, levelNumber={levelNumber}");
+            return null;
+        }
+        if (levelNumber < 1 || levelNumber > levelList.Count)
+        {
+            Debug.LogError($"GetLevelManagement: 关卡编号越界 levelNumber={levelNumber}, 关卡总数={levelList.Count}");
+            return null;
+        }
+        return levelList[levelNumber - 1];
     }
 
 
     public List<CardData> GetCardData(int chapterNumber, int levelNumber, int endStepCount)//获取关卡的卡牌内容
     {
         List<CardData> cardDataList = new List<CardData>();//卡牌数据
-        List<CardDataManagement> cardDataManagement = GetLevelManagement(chapterNumber, levelNumber).getCardData;//返回卡牌内容
+        LevelManagement level = GetLevelManagement(chapterNumber, levelNumber);
+        if (level == null)
+        {
+            Debug.LogError($"GetCardData: GetLevelManagement返回null, chapterNumber={chapterNumber}, levelNumber={levelNumber}");
+            return cardDataList;
+        }
+        List<CardDataManagement> cardDataManagement = level.getCardData;//返回卡牌内容
         foreach (CardDataManagement card in cardDataManagement)
         {
             if (card.getRound <= endStepCount)
