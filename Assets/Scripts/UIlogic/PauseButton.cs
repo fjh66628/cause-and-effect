@@ -1,11 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PauseButton : MonoBehaviour
 {
-    [SerializeField] private Pause pause;//暂停
+    [SerializeField] private Pause pause;//鏆傚仠
     public void QuitGameButton()
     {
         StartCoroutine(ResumeGameButtonCoroutine());
@@ -13,20 +13,21 @@ public class PauseButton : MonoBehaviour
     }
     IEnumerator ResumeGameButtonCoroutine()
     {
-        LoadingAnimator.Instance.SetLoading("返回主菜单");
+        LoadingAnimator.Instance.SetLoading("\u8fd4\u56de\u4e3b\u83dc\u5355");
         yield return new WaitForSeconds(1.2f);
         yield return SceneManager.LoadSceneAsync("StartScene");
         yield return new WaitForSeconds(0.6f);
-        CameraManager.Instance.ReSetCameraPosition();//重置相机位置
+        CameraManager.Instance.ReSetCameraPosition();//閲嶇疆鐩告満浣嶇疆
     }
     public void ResumeGameButton()
     {
-        GameManager.Instance.ReloadCurrentLevel();
-        pause.PauseGame();//暂停游戏
+        LoadManager.Instance.ReloadCurrentLevel();
+        pause.PauseGame();//鏆傚仠娓告垙
     }
-    public void RestartGameButton()//重新开始游戏按钮
+    public void RestartGameButton()//閲嶆柊寮€濮嬫父鎴忔寜閽?
     {
-        GameManager.Instance.ReloadCurrentLevel();
-        pause.GameOver();//暂停游戏
+        LoadManager.Instance.ReloadCurrentLevel();
+        pause.GameOver();//鏆傚仠娓告垙
     }
 }
+
